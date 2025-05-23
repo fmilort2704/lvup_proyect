@@ -1,0 +1,125 @@
+footer{
+    background-color: var(--color-fondo-header);
+    padding: 2rem;
+}
+
+#twitter, #instagram, #facebook, #youtube, #tiktok{
+    display: none;
+}
+
+h2 {
+    text-align: center;
+    font-family: var(--fuente-titulos);
+    margin-bottom: 1rem;
+}
+
+h3{
+    text-align: center;
+}
+
+#footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    gap: 2rem;
+}
+
+#footer > div {
+    margin: 1rem;
+}
+
+#redes ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: .5rem;
+    flex-wrap: wrap;
+    padding-right: 1.5rem;
+}
+
+#redes li {
+    margin-top: .4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+#metodos li{
+    margin-top: .4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+#legal li{
+    margin-top: .4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+ul{
+    list-style: none;
+}
+
+.modal-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 1rem;
+    max-width: 400px;
+    width: 90%;
+    position: relative;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.close-modal {
+    position: absolute;
+    top: 0.5rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+.legal-btn {
+    background: none;
+    border: none;
+    color: black;
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+}
+
+.botonFooter{
+    width: 80%;
+    background-color: black;
+    color: #fff;
+    padding: 1rem;
+    border-radius: .5rem;
+    margin-top: 1rem;
+}
+
+.botones-footer-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
