@@ -6,19 +6,22 @@ import menu from '../assets/Iconos/material-symbols--menu.svg';
 import search from '../assets/Iconos/material-symbols--search-rounded.svg';
 import flecha from '../assets/Iconos/weui--arrow-outlined.svg';
 import cruz from '../assets/Iconos/akar-icons--cross.svg';
+import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/Header.css';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [submenuOpen, setSubmenuOpen] = useState(false);
+    const [showUserMenu, setShowUserMenu] = useState(false);
 
-    const toggleMenu = () => {
-        setMenuOpen(!menuOpen);
-    };
+    const isLogged = Boolean(localStorage.getItem('id_usuario'));
+    const nombre = localStorage.getItem('nombre');
+    const gmail = localStorage.getItem('email');
+    const puntos = localStorage.getItem('puntos');
 
-    const toggleSubmenu = () => {
-        setSubmenuOpen(!submenuOpen);
-    };
+    const toggleMenu = () => setMenuOpen(!menuOpen);
+    const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
 
     return (
         <header className="p-4 bg-blue-600">
@@ -28,28 +31,71 @@ export default function Header() {
                     <h1>LvUp</h1>
                 </div>
                 <div className="header-right">
-                    <div id='login'>
-                        <img src={user} alt='user' />
-                        <span id='s-sesion'>Iniciar sesión</span>
+                    <div id='login' style={{ position: 'relative' }}>
+                        {isLogged ? (
+                            <>
+                                <img
+                                    src={icon_login}
+                                    alt='user'
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => setShowUserMenu(v => !v)}
+                                />
+                                {showUserMenu && (
+                                    <div id='user-menu'>
+                                        <div><strong>Nombre: </strong>{nombre}</div>
+                                        <div><strong>Gmail: </strong> {gmail}</div>
+                                        <div><strong>Puntos: </strong>{puntos}</div>
+                                        <div id='botones_perfil'>
+                                            <Link to={"/Editar"}
+                                                onClick={() => setShowUserMenu(false)}
+                                            >
+                                                <button>
+                                                    Editar perfil
+                                                </button>
+                                            </Link>
+                                            <button onClick={() => {
+                                                localStorage.removeItem('id_usuario');
+                                                localStorage.removeItem('nombre');
+                                                localStorage.removeItem('email');
+                                                localStorage.removeItem('puntos');
+                                                setShowUserMenu(false);
+                                                window.location.href = '/';
+                                            }}>
+                                                Cerrar sesión
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <Link to={"/login"}>
+                                <img src={user} alt='user' />
+                                <span id='s-sesion'>Iniciar sesión</span>
+                            </Link>
+                        )}
                     </div>
+                    <Link to={'/carrito'}>
                     <div id='carrito'>
                         <img src={carrito} alt='carrito' />
                         <span id='s-carrito'>Carrito</span>
                     </div>
+                    </Link>
                 </div>
             </div>
             <div id='searchBar'>
                 <div id='menu'>
-                    <div style={{ position: 'relative', width: '24px', height: '24px' }}>                        <img 
-                            src={menu} 
-                            alt='menu' 
+                    <div style={{ position: 'relative', width: '24px', height: '24px' }}>
+                        <img
+                            src={menu}
+                            alt='menu'
                             onClick={toggleMenu}
                             className={`menu-icon menu ${menuOpen ? 'slide-out' : 'slide-in'}`}
                             style={{ position: 'absolute' }}
-                        />                        
-                        <img 
-                            src={cruz} 
-                            alt='cerrar menu' 
+                        />
+                        <img
+                            src={cruz}
+                            alt='cerrar menu'
                             onClick={toggleMenu}
                             className={`menu-icon cruz ${menuOpen ? 'slide-in' : 'slide-out'}`}
                             style={{ position: 'absolute' }}
@@ -64,9 +110,9 @@ export default function Header() {
                         </li>
                         <li>
                             Categorias
-                            <img 
-                                src={flecha} 
-                                alt='flecha' 
+                            <img
+                                src={flecha}
+                                alt='flecha'
                                 onClick={toggleSubmenu}
                                 className={submenuOpen ? 'flecha-rotada' : ''}
                             />
@@ -80,7 +126,7 @@ export default function Header() {
                     </ul>
                 </div>
                 <div id='search'>
-                    <img src={search} alt='lupa'/>
+                    <img src={search} alt='lupa' />
                     <span id='s-search'>Buscar</span>
                 </div>
             </div>

@@ -81,7 +81,7 @@ ul{
     z-index: 9999;
 }
 .modal-content {
-    background: #fff;
+    background: var(--color-fondo-search);
     padding: 2rem;
     border-radius: 1rem;
     max-width: 400px;
@@ -89,6 +89,7 @@ ul{
     position: relative;
     max-height: 80vh;
     overflow-y: auto;
+    text-align: justify;
 }
 .close-modal {
     position: absolute;

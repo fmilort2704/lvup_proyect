@@ -1,0 +1,150 @@
+/* ...existing code... */
+#carrito-contenedor-principal {
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  box-sizing: border-box;
+}
+
+#carrito {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+#carrito.carrito-azul {
+  background: #6ec1f6;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 1.5rem;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.producto-carrito {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0.5rem 0;
+  margin-bottom: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.producto-carrito-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.producto-carrito-header-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 1rem;
+  flex: 1;
+  position: relative;
+}
+
+.producto-carrito-header-info h3 {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.producto-carrito img[alt='producto_imagen'] {
+  width: 120px;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+.producto-carrito img[alt='papelera'] {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.producto-carrito p {
+  margin: 0.2rem 0 0.2rem 0;
+  font-size: 1rem;
+  width: 100%;
+}
+
+.producto-carrito .precio-cantidad {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  margin: 0.5rem 0;
+  width: 100%;
+}
+
+.producto-carrito .precio-cantidad span {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.producto-carrito img[alt='restar'],
+.producto-carrito img[alt='sumar'] {
+  width: 28px;
+  height: 28px;
+  margin: 0 0.3rem;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+#carrito-total {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin: 1.5rem 0 1rem 0;
+  align-self: flex-end;
+  text-align: right;
+  width: 100%;
+}
+
+#carrito-pago {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+#carrito-pago img {
+  width: 60px;
+  height: 40px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.3rem 0.7rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+#carrito-pagar-btn:hover {
+  background: #444;
+}
+
+#pago{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 1rem;
+}
