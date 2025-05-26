@@ -1,6 +1,5 @@
 import { useProductos } from '../context/ProductosContext';
 import { useLocation } from 'react-router-dom';
-import './css/Producto.css';
 import paypal from '../assets/Iconos/mingcute--paypal-line.svg';
 import google from '../assets/Iconos/devicon--google.svg';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
@@ -162,16 +161,16 @@ export default function Producto() {
                                                     {producto.nombre}
                                                 </Link>
                                             </h3>
-                                            <img
-                                                src={addCarrito}
-                                                alt='carrito'
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => handleAddToCart(producto.id_producto)}
-                                            />
                                         </div>
                                         <p>{producto.descripcion}</p>
                                         <p className="precio">Desde {producto.precio}€</p>
                                     </div>
+                                    <img
+                                        onClick={() => handleAddToCart(producto.id_producto)}
+                                        src={addCarrito}
+                                        alt='carrito'
+                                        style={{ cursor: 'pointer' }}
+                                    />
                                 </div>
                             </div>
                         </div>))}

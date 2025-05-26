@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ojo from '../assets/Iconos/basil--eye-outline.svg';
-import './css/IniciarSesion.css';
-import md5 from 'md5';
+
 
 export default function InciarSesion({ onLogin }) {
     const [emailError, setEmailError] = useState("");
@@ -64,6 +63,10 @@ export default function InciarSesion({ onLogin }) {
         }
     }
 
+    function handleCrearCuenta() {
+        navigate('/CrearCuenta');
+    }
+
     return (
         <div id='container'>
             <h2>Iniciar sesión</h2>
@@ -80,7 +83,7 @@ export default function InciarSesion({ onLogin }) {
                 </div>
                 <div className="botones-login">
                     <button type="submit" disabled={loading}>{loading ? 'Cargando...' : 'Iniciar Sesión'}</button>
-                    <button type="button">Crear Cuenta</button>
+                    <button type="button" onClick={handleCrearCuenta}>Crear Cuenta</button>
                 </div>
                 {loginError && <div className="email-error email-error-active">{loginError}</div>}
             </form>

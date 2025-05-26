@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import papelera from '../assets/Iconos/mdi--rubbish-bin-empty.svg';
 import mas from '../assets/Iconos/ic--baseline-plus.svg';
 import menos from '../assets/Iconos/ic--baseline-minus.svg';
-import './css/Carrito.css';
 import paypal from '../assets/Iconos/mingcute--paypal-line.svg';
 import google from '../assets/Iconos/devicon--google.svg';
 import { Link } from 'react-router-dom';
 import Modal from '../components/Modal';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
+import { ProductosContext } from '../context/ProductosContext';
 
 export default function Carrito() {
     const [productos, setProductos] = useState([]);
+    const [otrosProductos, setOtrosProductos] = useState([]);
+    const { productos: productosContext } = useContext(ProductosContext);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [modal, setModal] = useState({
@@ -41,6 +43,12 @@ export default function Carrito() {
                 setLoading(false);
             });
     }, []);
+
+    useEffect(() => {
+        if (productosContext && productosContext.length > 0) {
+            setOtrosProductos(productosContext);
+        }
+    }, [productosContext]);
 
     const showModal = (title, message, type = 'info', onConfirm = null) => {
         setModal({
@@ -278,39 +286,40 @@ export default function Carrito() {
                 </div>
                 <div id='otrosProductos'>
                     <h2>Otros productos</h2>
-                    {productos.length > 0 && productos
-                        .sort(() => Math.random() - 0.5)
-                        .slice(0, 4)
-                        .map(producto => (
-                            <div key={producto.id_producto} className="tarjeta-producto">
-                                <div className="productos">
-                                    <div id='f-line-producto'>
-                                        <img src={producto.imagen_url} alt={producto.nombre} />
-                                        <div className="producto-info">
-                                            <div className="producto-header">
-                                                <h3>
-                                                    <Link
-                                                        className='link'
-                                                        to={`/producto`}
-                                                        state={{ id_producto: producto.id_producto }}
-                                                    >
-                                                        {producto.nombre}
-                                                    </Link>
-                                                </h3>
-                                                <img
-                                                    src={addCarrito}
-                                                    alt='carrito'
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={() => handleAddToCart(producto.id_producto)}
-                                                />
+                    {otrosProductos.length > 0 &&
+                        otrosProductos
+                            .sort(() => Math.random() - 0.5)
+                            .slice(0, 4)
+                            .map(producto => (
+                                <div key={producto.id_producto} className="tarjeta-producto">
+                                    <div className="productos">
+                                        <div id='f-line-producto'>
+                                            <img src={producto.imagen_url} alt={producto.nombre} />
+                                            <div className="producto-info">
+                                                <div className="producto-header">
+                                                    <h3>
+                                                        <Link
+                                                            className='link'
+                                                            to={`/producto`}
+                                                            state={{ id_producto: producto.id_producto }}
+                                                        >
+                                                            {producto.nombre}
+                                                        </Link>
+                                                    </h3>
+                                                    <img
+                                                        src={addCarrito}
+                                                        alt='carrito'
+                                                        style={{ cursor: 'pointer' }}
+                                                        onClick={() => handleAddToCart(producto.id_producto)}
+                                                    />
+                                                </div>
+                                                <p>{producto.descripcion}</p>
+                                                <p className="precio">Desde {producto.precio}€</p>
                                             </div>
-                                            <p>{producto.descripcion}</p>
-                                            <p className="precio">Desde {producto.precio}€</p>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                 </div>
             </div>
             <Modal

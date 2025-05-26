@@ -9,6 +9,7 @@ import Carrito from './pages/Carrito';
 import { ProductosProvider } from './context/ProductosContext';
 import { UserProvider } from './context/UserContext';
 import Editar from './pages/EditarPerfil';
+import CrearCuenta from './pages/CrearCuenta';
 
 function App() {
   // Estado para forzar recarga del header
@@ -28,6 +29,7 @@ function App() {
             <Route path='/login' element={<Login onLogin={handleHeaderReload} />} />
             <Route path='/Editar' element={<Editar />} />
             <Route path='/Carrito' element={<Carrito/>}/>
+            <Route path='/CrearCuenta' element={<CrearCuenta/>}/>
           </Routes >
           <Footer />
         </Router>

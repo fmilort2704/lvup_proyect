@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
-import "./css/Home.css";
+import "./css/estilos.css";
 import { useProductos } from '../context/ProductosContext';
 import Modal from '../components/Modal';
 
@@ -112,16 +112,16 @@ export default function Home() {
                         {producto.nombre}
                       </Link>
                     </h3>
-                    <img
+                  </div>
+                  <p>{producto.descripcion}</p>
+                  <p className="precio">Desde {producto.precio}€</p>
+                </div>
+                <img
                       onClick={() => handleAddToCart(producto.id_producto)}
                       src={addCarrito}
                       alt='carrito'
                       style={{ cursor: 'pointer' }}
                     />
-                  </div>
-                  <p>{producto.descripcion}</p>
-                  <p className="precio">Desde {producto.precio}€</p>
-                </div>
               </div>
             </div>
           </div>
@@ -139,18 +139,23 @@ export default function Home() {
                   <div className="producto-header">
                     <h3>
                       <Link
-                        className="link"
+                        className='link'
                         to={`/producto`}
                         state={{ id_producto: producto.id_producto }}
                       >
                         {producto.nombre}
                       </Link>
                     </h3>
-                    <img src={addCarrito} alt='carrito' onClick={() => handleAddToCart(producto.id_producto)} style={{ cursor: 'pointer' }} />
                   </div>
                   <p>{producto.descripcion}</p>
                   <p className="precio">Desde {producto.precio}€</p>
                 </div>
+                <img
+                      onClick={() => handleAddToCart(producto.id_producto)}
+                      src={addCarrito}
+                      alt='carrito'
+                      style={{ cursor: 'pointer' }}
+                    />
               </div>
             </div>
           </div>

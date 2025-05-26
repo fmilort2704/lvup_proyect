@@ -1,4 +1,3 @@
-import './css/EditarPerfil.css';
 import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
