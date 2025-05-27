@@ -191,7 +191,7 @@ h1{
 
 #botones_perfil {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.3rem;
 }
 
 #botones_perfil button, #botones_perfil a {

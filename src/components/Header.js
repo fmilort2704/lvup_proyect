@@ -83,11 +83,14 @@ export default function Header() {
                                         <div><strong>Gmail: </strong> {gmail}</div>
                                         <div><strong>Puntos: </strong>{puntos}</div>
                                         <div id='botones_perfil'>
-                                            <Link to={"/Editar"}
-                                                onClick={() => setShowUserMenu(false)}
-                                            >
+                                            <Link to={"/Editar"} onClick={() => setShowUserMenu(false)}>
                                                 <button>
                                                     Editar perfil
+                                                </button>
+                                            </Link>
+                                            <Link to="/Administracion" onClick={() => setShowUserMenu(false)}>
+                                                <button>
+                                                    Panel Admin
                                                 </button>
                                             </Link>
                                             <button onClick={() => {
@@ -95,6 +98,8 @@ export default function Header() {
                                                 localStorage.removeItem('nombre');
                                                 localStorage.removeItem('email');
                                                 localStorage.removeItem('puntos');
+                                                localStorage.removeItem('verificado');
+                                                localStorage.removeItem('rol');
                                                 setShowUserMenu(false);
                                                 window.location.href = '/';
                                             }}>

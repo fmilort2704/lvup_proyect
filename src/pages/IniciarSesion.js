@@ -37,6 +37,9 @@ export default function InciarSesion({ onLogin }) {
                     localStorage.setItem('email', data.usuario.email);
                     localStorage.setItem('puntos', data.usuario.puntos);
                     localStorage.setItem('contrasenya', password)
+                    localStorage.setItem('verificado', data.usuario.verificado);
+                    console.log(data.usuario.rol);
+                    localStorage.setItem('rol', data.usuario.rol);
                     if (onLogin) onLogin();
                     navigate('/');
                 } else {

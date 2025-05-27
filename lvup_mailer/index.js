@@ -70,6 +70,19 @@ app.post('/img_lvup/upload', upload.single('imagen'), (req, res) => {
   res.json({ success: true, filename: req.file.filename });
 });
 
+// Endpoint para eliminar imagen
+app.post('/img_lvup/delete', (req, res) => {
+  const { filename } = req.body;
+  if (!filename) return res.status(400).json({ success: false, error: 'Falta el nombre de la imagen.' });
+  const filePath = path.join(__dirname, '../public/img_lvup', filename);
+  fs.unlink(filePath, err => {
+    if (err) {
+      return res.status(500).json({ success: false, error: 'No se pudo eliminar la imagen.' });
+    }
+    res.json({ success: true });
+  });
+});
+
 app.listen(4000, () => {
   console.log('Servidor de correo escuchando en http://localhost:4000');
 });

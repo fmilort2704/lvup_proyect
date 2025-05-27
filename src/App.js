@@ -15,7 +15,10 @@ import Pasarela from './pages/Pasarela';
 import Publicacion from './pages/Publicacion';
 import Posts from './pages/Posts';
 import NuevoProducto from './pages/NuevoProducto';
-import NuevaPublicaión from './pages/NuevaPublicacion';
+import NuevaPublicacion from './pages/NuevaPublicacion';
+import EditarProducto from './pages/EditarProducto';
+import EditarPublicacion from './pages/EditarPublicacion';
+import Admin from './pages/Admin';
 
 function App() {
   // Estado para forzar recarga del header
@@ -41,7 +44,10 @@ function App() {
               <Route path='/Publicacion' element={<Publicacion />} />
               <Route path='/Posts' element={<Posts />} />
               <Route path='/NuevoProducto' element={<NuevoProducto/>}/>
-              <Route path='/NuevaPublicacion' element={<NuevaPublicaión/>}/>
+              <Route path='/NuevaPublicacion' element={<NuevaPublicacion/>}/>
+              <Route path='/EditarProducto' element={<EditarProducto/>}/>
+              <Route path='/EditarPublicacion' element={<EditarPublicacion/>}/>
+              <Route path='/Administracion' element={<Admin/>}/>
             </Routes >
             <Footer />
           </Router>
