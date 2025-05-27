@@ -4,7 +4,7 @@ import mas from '../assets/Iconos/ic--baseline-plus.svg';
 import menos from '../assets/Iconos/ic--baseline-minus.svg';
 import paypal from '../assets/Iconos/mingcute--paypal-line.svg';
 import google from '../assets/Iconos/devicon--google.svg';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
 import { ProductosContext } from '../context/ProductosContext';
@@ -22,11 +22,11 @@ export default function Carrito() {
         type: 'info',
         onConfirm: null
     });
+    const navigate = useNavigate();
 
     console.log(localStorage.getItem('id_usuario'));
     useEffect(() => {
         const id_usuario = localStorage.getItem('id_usuario');
-        console.log(id_usuario)
         if (!id_usuario) {
             setError("No se ha encontrado el usuario");
             setLoading(false);
@@ -35,7 +35,9 @@ export default function Carrito() {
         fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`)
             .then(res => res.json())
             .then(data => {
-                setProductos(data.carrito);
+                // Filtrar solo productos con estado 'activo'
+                const activos = (data.carrito || []).filter(p => p.estado === 'activo');
+                setProductos(activos);
                 setLoading(false);
             })
             .catch(() => {
@@ -222,6 +224,24 @@ export default function Carrito() {
         }
     };
 
+    // Botón de pago: redirige a la pasarela con los datos del carrito
+    const handlePagar = () => {
+        const productosPasarela = productos.map(p => ({
+            id_producto: p.id_producto || p.producto_id,
+            nombre: p.nombre,
+            precio: p.precio,
+            cantidad: p.cantidad,
+            subtotal: (p.precio * p.cantidad)
+        }));
+        const total = productosPasarela.reduce((acc, p) => acc + p.subtotal, 0);
+        navigate('/pasarela', {
+            state: {
+                productos: productosPasarela,
+                total: total.toFixed(2)
+            }
+        });
+    };
+
     if (loading) return <div id="container"><h2>Cargando carrito...</h2></div>;
     if (error) return <div id="container"><h2>{error}</h2></div>;
 
@@ -268,17 +288,17 @@ export default function Carrito() {
                             <div id='pago'>
                                 <div>
                                     <div className='botones-pago'>
-                                        <button className='btnPago'>
+                                        <button className='btnPago' onClick={handlePagar}>
                                             <img src={paypal} alt='paypal' />
                                             <p>PayPal</p>
                                         </button>
-                                        <button className='btnPago'>
+                                        <button className='btnPago' onClick={handlePagar}>
                                             <img src={google} alt='google' />
                                             <p>Pay</p>
                                         </button>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                        <button id='comprar'>Comprar</button>
+                                        <button id='comprar' onClick={handlePagar}>Comprar</button>
                                     </div>
                                 </div>
                             </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import logo from '../assets/Iconos/LvUp_icon.svg';
 import user from '../assets/Iconos/lucide--user.svg';
 import carrito from '../assets/Iconos/prime--cart-arrow-down.svg';
@@ -8,12 +8,20 @@ import flecha from '../assets/Iconos/weui--arrow-outlined.svg';
 import cruz from '../assets/Iconos/akar-icons--cross.svg';
 import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/Header.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useProductos } from '../context/ProductosContext';
 
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [submenuOpen, setSubmenuOpen] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [searchOpen, setSearchOpen] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+    const [filtered, setFiltered] = useState([]);
+    const searchInputRef = useRef(null);
+    const navigate = useNavigate();
+
+    const { productos } = useProductos();
 
     const isLogged = Boolean(localStorage.getItem('id_usuario'));
     const nombre = localStorage.getItem('nombre');
@@ -22,6 +30,35 @@ export default function Header() {
 
     const toggleMenu = () => setMenuOpen(!menuOpen);
     const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
+
+    // Animación y focus al abrir
+    const handleSearchClick = () => {
+        setSearchOpen(true);
+        setTimeout(() => searchInputRef.current && searchInputRef.current.focus(), 200);
+    };
+    // Filtrado en vivo
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchValue(value);
+        if (value.trim().length > 0) {
+            setFiltered(productos.filter(p => p.nombre.toLowerCase().includes(value.toLowerCase())));
+        } else {
+            setFiltered([]);
+        }
+    };
+    // Navegar al producto
+    const handleSelectProduct = (producto) => {
+        setSearchOpen(false);
+        setSearchValue('');
+        setFiltered([]);
+        navigate('/producto', { state: { id_producto: producto.id_producto } });
+    };
+    // Cerrar búsqueda
+    const handleCloseSearch = () => {
+        setSearchOpen(false);
+        setSearchValue('');
+        setFiltered([]);
+    };
 
     return (
         <header className="p-4 bg-blue-600">
@@ -76,10 +113,10 @@ export default function Header() {
                         )}
                     </div>
                     <Link to={'/carrito'}>
-                    <div id='carrito'>
-                        <img src={carrito} alt='carrito' />
-                        <span id='s-carrito'>Carrito</span>
-                    </div>
+                        <div id='carrito'>
+                            <img src={carrito} alt='carrito' />
+                            <span id='s-carrito'>Carrito</span>
+                        </div>
                     </Link>
                 </div>
             </div>
@@ -102,12 +139,10 @@ export default function Header() {
                         />
                     </div>
                     <ul id='listaMenu' className={menuOpen ? 'menu-open' : ''}>
-                        <li>
-                            Inicio
-                        </li>
-                        <li>
-                            Publicaciones
-                        </li>
+                        <li onClick={() => { setMenuOpen(false); navigate('/'); }}>Inicio</li>
+                        <li onClick={() => { setMenuOpen(false); navigate('/Posts'); }}>Publicaciones</li>
+                        <li onClick={() => { setMenuOpen(false); navigate('/NuevaPublicacion'); }}>Crear Publicación</li>
+                        <li onClick={() => { setMenuOpen(false); navigate('/NuevoProducto'); }}>Crear Producto</li>
                         <li>
                             Categorias
                             <img
@@ -117,17 +152,40 @@ export default function Header() {
                                 className={submenuOpen ? 'flecha-rotada' : ''}
                             />
                             <ul id='submenu' className={submenuOpen ? 'submenu-open' : ''}>
-                                <li>Videojuegos</li>
-                                <li>Consolas</li>
-                                <li>Mandos</li>
-                                <li>Merchandising</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Videojuegos' } }); }}>Videojuegos</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Consolas' } }); }}>Consolas</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Accesorios' } }); }}>Accesorios</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Merchandising' } }); }}>Merchandising</li>
                             </ul>
                         </li>
                     </ul>
                 </div>
                 <div id='search'>
-                    <img src={search} alt='lupa' />
-                    <span id='s-search'>Buscar</span>
+                    <img src={search} alt='lupa' style={{ cursor: 'pointer' }} onClick={handleSearchClick} />
+                    <span id='s-search' onClick={handleSearchClick} style={{ cursor: 'pointer' }}>Buscar</span>
+                    {searchOpen && (
+                        <div className="search-modal" onClick={handleCloseSearch}>
+                            <div className="search-modal-content" onClick={e => e.stopPropagation()}>
+                                <input
+                                    ref={searchInputRef}
+                                    type="text"
+                                    placeholder="Buscar producto..."
+                                    value={searchValue}
+                                    onChange={handleSearchChange}
+                                    style={{ width: '80%', minWidth: 180, maxWidth: 260, padding: '0.7rem 1rem', borderRadius: 8, border: '1.5px solid #18b6ff', fontSize: '1.1rem', marginBottom: '1rem', outline: 'none', marginRight: '2.5rem' }}
+                                />
+                                <div style={{ flex: 1, maxHeight: 220, overflowY: 'auto' }}>
+                                    {searchValue && filtered.length === 0 && <div style={{ color: '#888' }}>No hay resultados</div>}
+                                    {filtered.map(producto => (
+                                        <div key={producto.id_producto} style={{ padding: '0.5rem 0', cursor: 'pointer', borderBottom: '1px solid #eee' }} onClick={() => handleSelectProduct(producto)}>
+                                            {producto.nombre}
+                                        </div>
+                                    ))}
+                                </div>
+                                <button onClick={handleCloseSearch} style={{ position: 'absolute', top: 10, right: 10, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#18b6ff' }}>×</button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

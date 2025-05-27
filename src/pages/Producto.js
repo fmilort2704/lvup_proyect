@@ -1,5 +1,5 @@
 import { useProductos } from '../context/ProductosContext';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import paypal from '../assets/Iconos/mingcute--paypal-line.svg';
 import google from '../assets/Iconos/devicon--google.svg';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
@@ -13,6 +13,7 @@ export default function Producto() {
     const id_producto = location.state?.id_producto;
     const { productos } = useProductos();
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+    const navigate = useNavigate();
 
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
@@ -60,6 +61,10 @@ export default function Producto() {
                 type: 'error'
             });
         }
+    };
+
+    const handlePagar = () => {
+        navigate('/pasarela', { state: { precio: producto.precio, cantidad: 1, nombre: producto.nombre } });
     };
 
     const closeModal = () => {
@@ -117,17 +122,17 @@ export default function Producto() {
                             {producto.precio} €
                         </div>
                         <div className='botones-pago'>
-                            <button className='btnPago'>
+                            <button className='btnPago' onClick={handlePagar}>
                                 <img src={paypal} alt='paypal' />
                                 <p>PayPal</p>
                             </button>
-                            <button className='btnPago'>
+                            <button className='btnPago' onClick={handlePagar}>
                                 <img src={google} alt='google' />
                                 <p>Pay</p>
                             </button>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
-                            <button id='comprar'>Comprar ahora</button>
+                            <button id='comprar' onClick={handlePagar}>Comprar ahora</button>
                         </div>
                     </div>
                     <img

@@ -458,6 +458,7 @@ button.btnPago img {
     flex-direction: column;
     align-items: center;
     min-height: 80vh;
+    gap: 1.5rem;
 }
 
 .form-login {
@@ -547,5 +548,322 @@ button.btnPago img {
     font-weight: 500;
 }
 
+.tarjeta_publicaciones {
+    background: #18b6ff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    padding: 1.2rem 1rem 1.5rem 1rem;
+    margin: 1.2rem 0;
+    width: 270px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    min-height: 420px;
+}
 
+.tarjeta_publicaciones img[alt='imagen_publicacion'] {
+    width: 90%;
+    max-width: 200px;
+    height: 110px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+    border-radius: 8px;
+    background: #fff;
+}
 
+.tarjeta_publicaciones > h3 {
+    font-size: 1.2rem;
+    color: #222;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    margin-top: 0.2rem;
+    display: block;
+}
+
+.tarjeta_publicaciones img[alt='icono_usuario'] {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #fff;
+    margin: 0.7rem 0 0.2rem 0;
+    display: block;
+}
+
+.tarjeta_publicaciones span {
+    display: block;
+    text-align: center;
+    margin-bottom: 0.3rem;
+    color: #222;
+    font-size: 1.05rem;
+}
+
+.tarjeta_publicaciones span:first-of-type {
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+}
+
+.tarjeta_publicaciones span:last-of-type {   
+    font-size: 1rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0;
+    line-height: 1.3;
+    padding: 0 0.2rem;
+}
+
+.publicaciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2rem;
+    width: 100%;
+    padding: 1rem 0 2rem 0;
+}
+
+a{
+    text-decoration: none;
+}
+
+#cont_publi {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+#lat_izq{
+    width: 15%;
+    font-size: .7rem;
+    margin-right: 1rem;
+}
+
+#info_user{
+    display: flex;
+    width: 30%
+}
+
+#lat_izq > img{
+    width: 100px;
+    height: 120px;
+}
+
+#cent {
+    flex: 1 1 80%;
+    max-width: 80%;
+    min-width: 260px;
+    box-sizing: border-box;
+}
+
+#lat_der {
+    width: 100%;
+    margin-top: 2rem;
+}
+
+#comentario_publicacion {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+    margin: 1.5rem 0 2rem 0;
+    width: 100%;
+}
+
+#comentario_publicacion input[type="text"] {
+    color: black;
+    width: 100%;
+    box-sizing: border-box;
+    height: 2.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #bbb;
+    border-radius: .5rem;
+    padding: 0 0.8rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+}
+
+#comentario_publicacion input[type="text"]:focus {
+    border: 2px solid black;
+}
+
+#comentario_publicacion button {
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: black;
+    color: white;
+    width: 12rem;
+    height: 3rem;
+    border: none;
+    border-radius: .5rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#comentario_publicacion button:hover {
+    background-color: rgb(55, 54, 54);
+}
+
+.comentario-header {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    width: 100%;
+    margin-bottom: 0.3rem;
+}
+
+.comentario-header img[alt='icono_usuario'] {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #eee;
+}
+
+.comentario-header h3 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: bold;
+    color: #222;
+}
+
+.comentario-header #tiempo {
+    margin-left: 0.7rem;
+    color: #888;
+    font-size: 0.98rem;
+    font-weight: normal;
+}
+
+.comentario-contenido {
+    margin-left: 2.7rem;
+    margin-top: 0.2rem;
+    font-size: 1.05rem;
+    color: #222;
+    text-align: left;
+    word-break: break-word;
+}
+
+/* --- Estilos para el modal de búsqueda --- */
+.search-modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.25);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn .2s;
+}
+.search-modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    min-width: 320px;
+    min-height: 120px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+    position: relative;
+    animation: slideDown .3s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- NuevaPublicacion (formulario de crear publicación) --- */
+.nueva-publicacion-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    gap: 1.5rem;
+}
+
+.form-publicacion {
+    width: 60%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2em;
+    padding-bottom: 2.3rem;
+    border-radius: 1rem;
+    background: #f7fbff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 2.5rem 2rem 2.5rem 2rem;
+    max-width: 480px;
+}
+
+.form-publicacion label {
+    font-weight: 600;
+    color: #222;
+    margin-bottom: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.form-publicacion input[type="text"],
+.form-publicacion textarea {
+    color: black;
+    width: 100%;
+    box-sizing: border-box;
+    height: 2.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid #bbb;
+    border-radius: .5rem;
+    padding: 0 0.8rem;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+    background: #fff;
+}
+
+.form-publicacion textarea {
+    min-height: 120px;
+    resize: vertical;
+    padding: 0.7rem 0.8rem;
+    font-family: inherit;
+}
+
+.form-publicacion input[type="text"]:focus,
+.form-publicacion textarea:focus {
+    border: 2px solid black;
+}
+
+.form-publicacion input[type="file"] {
+    margin-top: 0.2rem;
+    margin-bottom: 0.7rem;
+    font-size: 1rem;
+}
+
+.form-publicacion .btn-principal {
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: black;
+    color: white;
+    width: 100%;
+    height: 3rem;
+    margin-top: 1.2rem;
+    border-radius: .5rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.form-publicacion .btn-principal:hover {
+    background-color: #222;
+}
+
+.nueva-publicacion-container h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1.2rem;
+    color: black;
+    text-align: center;
+}

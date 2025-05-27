@@ -1,16 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
 import "./css/estilos.css";
 import { useProductos } from '../context/ProductosContext';
 import Modal from '../components/Modal';
 
 export default function Home() {
+  const location = useLocation();
   const { productos, setProductos } = useProductos();
   const [nuevosProductos, setNuevosProductos] = useState([]);
   const [productosSegundaMano, setProductosSegundaMano] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
+
+  const categoriaToId = {
+    'Consolas': 1,
+    'Videojuegos': 2,
+    'Accesorios': 3,
+    'Merchandising': 4
+  };
+
+  useEffect(() => {
+    if (location.state && location.state.categoria) {
+      setCategoriaSeleccionada(location.state.categoria);
+    } else {
+      setCategoriaSeleccionada(null);
+    }
+  }, [location.state]);
+
   const handleAddToCart = async (producto_id) => {
     const usuario_id = localStorage.getItem('id_usuario');
     if (!usuario_id) {
@@ -66,19 +84,24 @@ export default function Home() {
   useEffect(() => {
     const fetchProductos = async () => {
       try {
-        const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos');
-        if (!response.ok) {
-          throw new Error('Error al cargar los productos');
+        let data;
+        if (categoriaSeleccionada && categoriaToId[categoriaSeleccionada]) {
+          const response = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_categoria/${categoriaToId[categoriaSeleccionada]}`);
+          if (!response.ok) throw new Error('Error al cargar los productos de la categoría');
+          data = await response.json();
+          setProductos(data.productos);
+          setNuevosProductos([]);
+          setProductosSegundaMano([]);
+        } else {
+          const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos');
+          if (!response.ok) throw new Error('Error al cargar los productos');
+          data = await response.json();
+          setProductos(data.productos);
+          const nuevos = data.productos.filter(producto => producto.estado === "nuevo");
+          const segundaMano = data.productos.filter(producto => producto.estado === "segunda_mano");
+          setNuevosProductos(nuevos);
+          setProductosSegundaMano(segundaMano);
         }
-        const data = await response.json();
-        setProductos(data.productos);
-        console.log(data.productos)
-
-        const nuevos = data.productos.filter(producto => producto.estado === "nuevo");
-        const segundaMano = data.productos.filter(producto => producto.estado === "segunda_mano");
-
-        setNuevosProductos(nuevos);
-        setProductosSegundaMano(segundaMano);
         setLoading(false);
       } catch (err) {
         console.error("Error al llamar a la función: " + err.message);
@@ -87,16 +110,24 @@ export default function Home() {
     };
 
     fetchProductos();
-  }, []);
+  }, [categoriaSeleccionada]);
+
+  // Filtrado por categoría
+
+  console.log(categoriaSeleccionada)
+  const productosFiltrados = categoriaSeleccionada
+    ? productos
+    : productos;
 
   if (loading) return <div>Cargando...</div>;
   console.log(localStorage.getItem('id_usuario'));
 
   return (
     <div id='container'>
-      <h2>Productos nuevos</h2>
+      {categoriaSeleccionada && <h2>Productos de {categoriaSeleccionada}</h2>}
+      {!categoriaSeleccionada && <h2>Productos nuevos</h2>}
       <div className="productos">
-        {nuevosProductos.map(producto => (
+        {(categoriaSeleccionada ? productosFiltrados : nuevosProductos).map(producto => (
           <div key={producto.id} className="tarjeta-producto">
             <div className="productos">
               <div id='f-line-producto'>
@@ -127,7 +158,7 @@ export default function Home() {
           </div>
         ))}
       </div>
-
+      {!categoriaSeleccionada && <>
       <h2>Productos de Segunda mano</h2>
       <div className="productos">
         {productosSegundaMano.map(producto => (
@@ -161,7 +192,8 @@ export default function Home() {
           </div>
         ))}
       </div>
-
+      </>
+      }
       <Modal
         isOpen={modal.isOpen}
         onClose={closeModal}
