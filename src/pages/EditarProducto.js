@@ -13,8 +13,16 @@ export default function EditarProducto() {
     const [precio, setPrecio] = useState(producto?.precio || "");
     const [imagen, setImagen] = useState(null);
     const [categoria, setCategoria] = useState(producto?.categoria_id ? String(producto.categoria_id) : "");
+    const [stock, setStock] = useState(producto?.stock || "");
+    const [fechaSalida, setFechaSalida] = useState(producto?.fecha_salida || "");
+    const [empresa, setEmpresa] = useState(producto?.empresa || "");
+    const [pegi, setPegi] = useState(producto?.pegi || "");
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
+
+    // Detectar si es admin editando SOLO si viene del panel de administración
+    // El admin en su panel personal verá el formulario de usuario normal
+    const isAdminEdit = location.state?.fromAdministracion === true && localStorage.getItem('rol') === 'admin' && localStorage.getItem('adminView') === 'admin';
 
     useEffect(() => {
         if (!producto) {
@@ -77,7 +85,8 @@ export default function EditarProducto() {
             descripcion_larga: descripcionLarga,
             precio,
             imagen_url,
-            categoria_id: categoria
+            categoria_id: categoria,
+            ...(isAdminEdit && { stock, fecha_salida: fechaSalida, empresa, pegi })
         };
         try {
             const res = await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_producto/${producto.id_producto}`, {
@@ -139,6 +148,29 @@ export default function EditarProducto() {
                         <option value="4">Merchandising</option>
                     </select>
                 </label>
+                {isAdminEdit && (
+                    <>
+                        <label>Stock:
+                            <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} required />
+                        </label>
+                        <label>Fecha de salida:
+                            <input type="date" value={fechaSalida} onChange={e => setFechaSalida(e.target.value)} required />
+                        </label>
+                        <label>Empresa:
+                            <input type="text" value={empresa} onChange={e => setEmpresa(e.target.value)} required maxLength={80} />
+                        </label>
+                        <label>Pegi:
+                            <select value={pegi} onChange={e => setPegi(e.target.value)} required>
+                                <option value="">Selecciona PEGI</option>
+                                <option value="3">3</option>
+                                <option value="7">7</option>
+                                <option value="12">12</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                            </select>
+                        </label>
+                    </>
+                )}
                 <button type="submit" className="btn-principal">Guardar cambios</button>
             </form>
             <Modal 

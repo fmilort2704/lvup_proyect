@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Modal from '../components/Modal';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function NuevoProducto() {
     const [nombre, setNombre] = useState("");
@@ -9,9 +9,18 @@ export default function NuevoProducto() {
     const [precio, setPrecio] = useState("");
     const [imagen, setImagen] = useState(null);
     const [categoria, setCategoria] = useState("");
+    const [stock, setStock] = useState("");
+    const [fechaSalida, setFechaSalida] = useState("");
+    const [empresa, setEmpresa] = useState("");
+    const [pegi, setPegi] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Detectar si viene del panel admin para crear producto nuevo
+    const isAdminNuevo = location.state?.fromAdministracion === true;
+    console.log(isAdminNuevo);
 
     const handleImagenChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -21,7 +30,6 @@ export default function NuevoProducto() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(localStorage.getItem('verificado'))
         if (!imagen) return;
         // Verificado y vendedor desde localStorage
         const verificado = localStorage.getItem('verificado');
@@ -30,6 +38,14 @@ export default function NuevoProducto() {
             setModalMsg('Debes iniciar sesión para crear un producto.');
             setModalOpen(true);
             return;
+        }
+        // Validaciones extra para admin
+        if (isAdminNuevo) {
+            if (!stock || !fechaSalida || !empresa || !pegi) {
+                setModalMsg('Completa todos los campos obligatorios para productos nuevos.');
+                setModalOpen(true);
+                return;
+            }
         }
         // Subir imagen
         const formData = new FormData();
@@ -48,7 +64,7 @@ export default function NuevoProducto() {
                 return;
             }
         } catch (err) {
-            setModalMsg('Error de red al subir la imagen.');
+            setModalMsg('Error de red al subir la imagen. ' + err);
             setModalOpen(true);
             return;
         }
@@ -63,30 +79,45 @@ export default function NuevoProducto() {
                 imagen_url,
                 verificado,
                 categoria_id: categoria,
-                vendedor_id
+                vendedor_id,
+                ...(isAdminNuevo && { stock, fecha_salida: fechaSalida, empresa, pegi })
             };
             try {
-                const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_producto_segunda_mano', {
+                const endpoint = isAdminNuevo
+                    ? 'http://localhost/Proyectos/LvUp_backend/api/crear_producto'
+                    : 'http://localhost/Proyectos/LvUp_backend/api/crear_producto_segunda_mano';
+                const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(body)
                 });
-                const data = await res.json();
-                if (data) {
+                let data;
+                try {
+                    data = await res.json();
+                } catch (jsonErr) {
+                    setModalMsg('Respuesta del servidor no es JSON válido.');
+                    setModalOpen(true);
+                    console.error('Error parseando JSON:', jsonErr);
+                    return;
+                }
+                console.log('Respuesta backend:', data);
+                if (res.ok && data && data.mensaje && data.mensaje.includes('creado')) {
                     setModalMsg('¡Producto creado con éxito!');
                     setModalOpen(true);
                     setTimeout(() => {
-                        setModalOpen(false);
-                        navigate('/');
+                        setTimeout(() => {
+                            navigate('/Administracion');
+                        }, 1500);
                     }, 1500);
                 } else {
-                    setModalMsg('Error al crear el producto.');
+                    setModalMsg(data?.mensaje || data?.error || 'Error al crear el producto.');
                     setModalOpen(true);
                 }
             } catch (err) {
-                setModalMsg('Error de red o servidor.');
+                setModalMsg('Error de red o servidor.' + err);
+                console.log(err)
                 setModalOpen(true);
             }
         }
@@ -120,12 +151,35 @@ export default function NuevoProducto() {
                         <option value="4">Merchandising</option>
                     </select>
                 </label>
+                {isAdminNuevo && (
+                    <>
+                        <label>Stock:
+                            <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} required />
+                        </label>
+                        <label>Fecha de salida:
+                            <input type="date" value={fechaSalida} onChange={e => setFechaSalida(e.target.value)} required />
+                        </label>
+                        <label>Empresa:
+                            <input type="text" value={empresa} onChange={e => setEmpresa(e.target.value)} required maxLength={80} />
+                        </label>
+                        <label>Pegi:
+                            <select value={pegi} onChange={e => setPegi(e.target.value)} required>
+                                <option value="">Selecciona PEGI</option>
+                                <option value="3">3</option>
+                                <option value="7">7</option>
+                                <option value="12">12</option>
+                                <option value="16">16</option>
+                                <option value="18">18</option>
+                            </select>
+                        </label>
+                    </>
+                )}
                 <button type="submit" className="btn-principal">Crear producto</button>
             </form>
-            <Modal 
-                isOpen={modalOpen} 
-                onClose={() => setModalOpen(false)} 
-                message={modalMsg} 
+            <Modal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                message={modalMsg}
             />
         </div>
     );

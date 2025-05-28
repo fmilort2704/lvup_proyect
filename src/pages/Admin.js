@@ -152,7 +152,7 @@ export default function Admin() {
             {localStorage.getItem('rol') === 'admin' && adminView === 'admin' ? (
                 <>
                     <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.2rem' }}>
-                        <button className="admin-btn" onClick={() => navigate('/NuevoProducto')}>
+                        <button className="admin-btn" onClick={() => navigate('/NuevoProducto', {state: {fromAdministracion: true}})}>
                             Crear producto
                         </button>
                     </div>
@@ -183,7 +183,7 @@ export default function Admin() {
                             <span>{p.nombre}</span>
                             <div className="admin-actions">
                                 {(adminView !== 'admin' || p.estado === 'nuevo') && (
-                                    <button className="admin-btn" onClick={() => navigate('/EditarProducto', { state: { producto: p } })}>Editar</button>
+                                    <button className="admin-btn" onClick={() => navigate('/EditarProducto', { state: { producto: p, fromAdministracion: true} })}>Editar</button>
                                 )}
                                 <button className="admin-btn admin-btn-danger" onClick={() => eliminarProducto(p.id_producto)}>Eliminar</button>
                             </div>

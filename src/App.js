@@ -19,6 +19,7 @@ import NuevaPublicacion from './pages/NuevaPublicacion';
 import EditarProducto from './pages/EditarProducto';
 import EditarPublicacion from './pages/EditarPublicacion';
 import Admin from './pages/Admin';
+import Valoraciones from './pages/Valoraciones';
 
 function App() {
   // Estado para forzar recarga del header
@@ -48,6 +49,7 @@ function App() {
               <Route path='/EditarProducto' element={<EditarProducto/>}/>
               <Route path='/EditarPublicacion' element={<EditarPublicacion/>}/>
               <Route path='/Administracion' element={<Admin/>}/>
+              <Route path='/Valoraciones' element={<Valoraciones/>}/>
             </Routes >
             <Footer />
           </Router>

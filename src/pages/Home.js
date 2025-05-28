@@ -120,7 +120,7 @@ export default function Home() {
     : productos;
 
   if (loading) return <div>Cargando...</div>;
-  console.log(localStorage.getItem('id_usuario'));
+  console.log(localStorage);
 
   return (
     <div id='container'>

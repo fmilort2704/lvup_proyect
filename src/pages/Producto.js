@@ -71,6 +71,13 @@ export default function Producto() {
         setModal({ isOpen: false, title: '', message: '', type: 'info' });
     };
 
+    // Formatea fecha a DD-MM-YYYY
+    function formatFechaDMY(fechaRaw) {
+        if (!fechaRaw) return '';
+        const [y, m, d] = fechaRaw.split(' ')[0].split('-');
+        return `${d}-${m}-${y}`;
+    }
+
     if (!productos) return <div>Cargando...</div>;
     if (!id_producto) return <div>Producto no encontrado</div>;
 
@@ -96,14 +103,33 @@ export default function Producto() {
                     <div className="info-texto">
                         <h2>{producto.nombre}</h2>
                         <div id='detallesProducto-sl'>
-                            <div id='empresa'>
-                                <h3>Empresa:</h3>
-                                <p>{producto.empresa}</p>
-                            </div>
-                            <div id='fecha'>
-                                <h3>Fecha de salida:</h3>
-                                <p>{producto.fecha_salida}</p>
-                            </div>
+                            {producto.estado === 'segunda_mano' ? (
+                                <>
+                                    <div id='usuario'>
+                                        <h3>Usuario:</h3>
+                                        <p>
+                                            <Link className='link' to='/Valoraciones' state={{ id_usuario: producto.vendedor_id }}>
+                                                    {producto.nombre_usuario || producto.usuario || 'Usuario desconocido'}
+                                            </Link>
+                                        </p>
+                                    </div>
+                                    <div id='fecha'>
+                                        <h3>Fecha de publicación:</h3>
+                                        <p>{formatFechaDMY(producto.fecha_publicacion || producto.fecha_salida)}</p>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div id='empresa'>
+                                        <h3>Empresa:</h3>
+                                        <p>{producto.empresa}</p>
+                                    </div>
+                                    <div id='fecha'>
+                                        <h3>Fecha de salida:</h3>
+                                        <p>{producto.fecha_salida}</p>
+                                    </div>
+                                </>
+                            )}
                         </div>
                         {pegiSrc && (
                             <div id='pegi'>

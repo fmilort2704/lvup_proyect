@@ -986,3 +986,102 @@ a{
     margin-left: 0.7rem;
     font-size: 1.01rem;
 }
+
+/* --- Valoraciones --- */
+.valoraciones-container {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px #0001;
+    padding: 2rem;
+}
+.valoraciones-container h2 {
+    text-align: center;
+    color: #3b3b3b;
+    margin-bottom: 1.5rem;
+}
+.valoraciones-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.valoracion-item {
+    background: #f7f7fa;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    padding: 1rem 1.2rem;
+    box-shadow: 0 1px 4px #0001;
+}
+.valoracion-item > div:first-child {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+.valoracion-item b {
+    color: #2a2a2a;
+}
+.valoracion-item span {
+    color: #f5b50a;
+    font-size: 1.1em;
+}
+.valoracion-item > div:last-child {
+    color: #444;
+}
+.form-valoracion {
+    margin-top: 2.5rem;
+    background: #f3f6fa;
+    border-radius: 10px;
+    padding: 1.5rem 1.2rem;
+    box-shadow: 0 1px 6px #0001;
+}
+.form-valoracion h3 {
+    margin-bottom: 1rem;
+    color: #2a2a2a;
+    text-align: center;
+}
+.form-valoracion label {
+    display: block;
+    margin-bottom: 12px;
+    color: #333;
+    font-weight: 500;
+}
+.form-valoracion select {
+    margin-left: 8px;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    border: 1px solid #bbb;
+}
+.form-valoracion textarea {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    padding: 0.5rem;
+    margin-top: 6px;
+    resize: vertical;
+    font-family: inherit;
+}
+.form-valoracion button[type="submit"] {
+    background: #4e8cff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    font-size: 1.1em;
+    cursor: pointer;
+    box-shadow: 0 1px 4px #0001;
+    transition: background 0.2s;
+    margin-top: 0.5rem;
+}
+.form-valoracion button[type="submit"]:hover {
+    background: #2566c7;
+}
+
+#comentario_publicacion .comentario-botones {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+}

@@ -1,4 +1,4 @@
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/estilos.css';
@@ -100,7 +100,13 @@ export default function Publicacion() {
                 <div id='lat_izq'>
                     <div id='info_user'>
                         <img src={icon_login} alt='icono_usuario' />
-                        <h2>{post.nombre}</h2>
+                        <h2>
+                            {post.autor_id ? (
+                                <Link className='link' to='/Valoraciones' state={{ id_usuario: post.autor_id }}>
+                                    {post.nombre}
+                                </Link>
+                            ) : post.nombre}
+                        </h2>
                     </div>
                     <img src={post.img_publicacion} alt='imagen_publicacion' />
                 </div>
@@ -118,9 +124,16 @@ export default function Publicacion() {
                             onChange={e => setNuevoComentario(e.target.value)}
                             disabled={enviando}
                         />
-                        <button onClick={handleComentar} disabled={enviando || !nuevoComentario.trim()}>
-                            Comentar
-                        </button>
+                        <div className="comentario-botones">
+                            <button onClick={handleComentar} disabled={enviando || !nuevoComentario.trim()}>
+                                Comentar
+                            </button>
+                            {localStorage.getItem('id_usuario') && localStorage.getItem('id_usuario') !== String(post.autor_id) && (
+                                <Link to="/Valoraciones" state={{ post: post }}>
+                                    <button className="btn-valoracion">Deja valoración</button>
+                                </Link>
+                            )}
+                        </div>
                     </div>
                     <div id='publicacion_comentarios'>
                         {comentariosLoading ? (
