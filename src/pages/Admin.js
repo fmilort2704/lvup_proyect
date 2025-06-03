@@ -11,6 +11,7 @@ export default function Admin() {
     const [modalMsg, setModalMsg] = useState("");
     const [loading, setLoading] = useState(true);
     const [adminView, setAdminView] = useState(null); // null: no elegido, 'admin', 'user'
+    const [modalConfirm, setModalConfirm] = useState({ open: false, msg: '', onConfirm: null });
     const navigate = useNavigate();
 
     // Solo permitir acceso si es admin
@@ -83,52 +84,77 @@ export default function Admin() {
     };
 
     const bloquearUsuario = async (id) => {
-        if (!window.confirm('¿Bloquear este usuario permanentemente?')) return;
-        try {
-            await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_usuario/${id}`, { method: 'DELETE' });
-            setModalMsg('Usuario bloqueado.');
-            setModalOpen(true);
-            fetchData();
-        } catch {
-            setModalMsg('Error al bloquear usuario.');
-            setModalOpen(true);
-        }
+        setModalConfirm({
+            open: true,
+            msg: '¿Bloquear este usuario permanentemente?',
+            onConfirm: async () => {
+                console.log("Borrar")
+                try {
+                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_usuario/${id}`, { method: 'DELETE' });
+                    setModalMsg('Usuario bloqueado.');
+                    setModalOpen(true);
+                    fetchData();
+                } catch {
+                    setModalMsg('Error al bloquear usuario.');
+                    setModalOpen(true);
+                }
+                setModalConfirm({ open: false, msg: '', onConfirm: null });
+            }
+        });
     };
     const eliminarProducto = async (id) => {
-        if (!window.confirm('¿Eliminar este producto?')) return;
-        try {
-            await fetch(`http://localhost/Proyectos/LvUp_backend/api/borrar_producto/${id}`, { method: 'DELETE' });
-            setModalMsg('Producto eliminado.');
-            setModalOpen(true);
-            fetchData();
-        } catch {
-            setModalMsg('Error al eliminar producto.');
-            setModalOpen(true);
-        }
+        setModalConfirm({
+            open: true,
+            msg: '¿Eliminar este producto?',
+            onConfirm: async () => {
+                try {
+                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/borrar_producto/${id}`, { method: 'DELETE' });
+                    setModalMsg('Producto eliminado.');
+                    setModalOpen(true);
+                    fetchData();
+                } catch {
+                    setModalMsg('Error al eliminar producto.');
+                    setModalOpen(true);
+                }
+                setModalConfirm({ open: false, msg: '', onConfirm: null });
+            }
+        });
     };
     const eliminarPost = async (id) => {
-        if (!window.confirm('¿Eliminar esta publicación?')) return;
-        try {
-            await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_post/${id}`, { method: 'DELETE' });
-            setModalMsg('Publicación eliminada.');
-            setModalOpen(true);
-            fetchData();
-        } catch {
-            setModalMsg('Error al eliminar publicación.');
-            setModalOpen(true);
-        }
+        setModalConfirm({
+            open: true,
+            msg: '¿Eliminar esta publicación?',
+            onConfirm: async () => {
+                try {
+                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_post/${id}`, { method: 'DELETE' });
+                    setModalMsg('Publicación eliminada.');
+                    setModalOpen(true);
+                    fetchData();
+                } catch {
+                    setModalMsg('Error al eliminar publicación.');
+                    setModalOpen(true);
+                }
+                setModalConfirm({ open: false, msg: '', onConfirm: null });
+            }
+        });
     };
     const eliminarComentario = async (id) => {
-        if (!window.confirm('¿Eliminar este comentario?')) return;
-        try {
-            await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_comentario/${id}`, { method: 'DELETE' });
-            setModalMsg('Comentario eliminado.');
-            setModalOpen(true);
-            fetchData();
-        } catch {
-            setModalMsg('Error al eliminar comentario.');
-            setModalOpen(true);
-        }
+        setModalConfirm({
+            open: true,
+            msg: '¿Eliminar este comentario?',
+            onConfirm: async () => {
+                try {
+                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_comentario/${id}`, { method: 'DELETE' });
+                    setModalMsg('Comentario eliminado.');
+                    setModalOpen(true);
+                    fetchData();
+                } catch {
+                    setModalMsg('Error al eliminar comentario.');
+                    setModalOpen(true);
+                }
+                setModalConfirm({ open: false, msg: '', onConfirm: null });
+            }
+        });
     };
 
     // Mostrar pantalla de selección aunque loading sea true si adminView === null
@@ -136,7 +162,7 @@ export default function Admin() {
         return (
             <div className="admin-panel">
                 <h2>¿Qué panel deseas ver?</h2>
-                <div style={{ display: 'flex', gap: 24, justifyContent: 'center', margin: '2rem 0' }}>
+                <div id='botonesAdmin'>
                     <button className="admin-btn" onClick={() => setAdminView('admin')}>Panel de administrador</button>
                     <button className="admin-btn" onClick={() => setAdminView('user')}>Mi panel personal</button>
                 </div>
@@ -151,8 +177,8 @@ export default function Admin() {
             <h2>Panel de Administración</h2>
             {localStorage.getItem('rol') === 'admin' && adminView === 'admin' ? (
                 <>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1.2rem' }}>
-                        <button className="admin-btn" onClick={() => navigate('/NuevoProducto', {state: {fromAdministracion: true}})}>
+                    <div id='ctnCrearProducto' style={{}}>
+                        <button className="admin-btn" onClick={() => navigate('/NuevoProducto', { state: { fromAdministracion: true } })}>
                             Crear producto
                         </button>
                     </div>
@@ -183,7 +209,7 @@ export default function Admin() {
                             <span>{p.nombre}</span>
                             <div className="admin-actions">
                                 {(adminView !== 'admin' || p.estado === 'nuevo') && (
-                                    <button className="admin-btn" onClick={() => navigate('/EditarProducto', { state: { producto: p, fromAdministracion: true} })}>Editar</button>
+                                    <button className="admin-btn" onClick={() => navigate('/EditarProducto', { state: { producto: p, fromAdministracion: true } })}>Editar</button>
                                 )}
                                 <button className="admin-btn admin-btn-danger" onClick={() => eliminarProducto(p.id_producto)}>Eliminar</button>
                             </div>
@@ -221,6 +247,15 @@ export default function Admin() {
                 </ul>
             </div>
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} message={modalMsg} />
+            {modalConfirm.open && (
+                <Modal
+                    isOpen={modalConfirm.open}
+                    onClose={() => setModalConfirm({ open: false, msg: '', onConfirm: null })}
+                    message={modalConfirm.msg}
+                    onConfirm={modalConfirm.onConfirm}
+                    type="confirm"
+                />
+            )}
         </div>
     );
 }

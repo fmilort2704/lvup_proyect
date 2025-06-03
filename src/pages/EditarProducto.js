@@ -119,13 +119,13 @@ export default function EditarProducto() {
             <h2>Editando producto</h2>
             <form className="form-publicacion" onSubmit={handleSubmit}>
                 <label>Nombre:
-                    <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} required maxLength={80} />
+                    <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} required maxLength={150} />
                 </label>
                 <label>Descripción corta:
-                    <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} required maxLength={120} />
+                    <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} required  />
                 </label>
                 <label>Descripción larga:
-                    <textarea value={descripcionLarga} onChange={e => setDescripcionLarga(e.target.value)} required rows={6} maxLength={2000} />
+                    <textarea value={descripcionLarga} onChange={e => setDescripcionLarga(e.target.value)} required rows={6} />
                 </label>
                 <label>Precio (€):
                     <input type="number" min="0" step="0.01" value={precio} onChange={e => setPrecio(e.target.value)} required />
@@ -133,9 +133,9 @@ export default function EditarProducto() {
                 <label>Imagen del producto:
                     <input type="file" accept="image/*" onChange={handleImagenChange} />
                     {producto?.imagen_url && (
-                        <div style={{marginTop: '0.5rem'}}>
+                        <div>
                             <span>Imagen actual:</span><br/>
-                            <img src={producto.imagen_url} alt="imagen_producto" style={{maxWidth: 120, maxHeight: 120, borderRadius: 8}} />
+                            <img src={producto.imagen_url} alt="imagen_producto" />
                         </div>
                     )}
                 </label>

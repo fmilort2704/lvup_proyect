@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ojo from '../assets/Iconos/basil--eye-outline.svg';import Modal from '../components/Modal';
+import ojo from '../assets/Iconos/basil--eye-outline.svg';
+import ojo_cerradp from '../assets/Iconos/mdi--eye-closed.svg';
+import Modal from '../components/Modal';
 
 export default function CrearCuenta() {
     const [emailError, setEmailError] = useState("");
@@ -8,6 +10,8 @@ export default function CrearCuenta() {
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
     const [loading, setLoading] = useState(false);
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
 
     function handleSubmit(e) {
@@ -92,11 +96,38 @@ export default function CrearCuenta() {
                 <input placeholder="E-mail" type="email" id="email" name="email" required onChange={handleEmailChange} onBlur={handleEmailBlur} />
                 {emailError && <div className={`email-error${emailError ? ' email-error-active' : ''}`}>{emailError}</div>}
                 <div className="input-password-wrapper">
-                    <input placeholder="Contraseña" type="password" id="password" name="password" required onBlur={handlePasswordBlur} />
-                    <img src={ojo} alt='ojo' className="icono-ojo" tabIndex={0} />
+                    <input
+                        placeholder="Contraseña"
+                        type={showPassword ? "text" : "password"}
+                        id="password"
+                        name="password"
+                        required
+                        onBlur={handlePasswordBlur}
+                    />
+                    <img
+                        src={showPassword ? ojo_cerradp : ojo}
+                        alt={showPassword ? 'ojo cerrado' : 'ojo abierto'}
+                        className="icono-ojo"
+                        tabIndex={0}
+                        onClick={() => setShowPassword(v => !v)}
+                    />
                 </div>
                 <div className="input-password-wrapper">
-                    <input placeholder="Confirmar contraseña" type="password" id="confirmPassword" name="confirmPassword" required onBlur={handlePasswordBlur} />
+                    <input
+                        placeholder="Confirmar contraseña"
+                        type={showConfirmPassword ? "text" : "password"}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        required
+                        onBlur={handlePasswordBlur}
+                    />
+                    <img
+                        src={showConfirmPassword ? ojo_cerradp : ojo}
+                        alt={showConfirmPassword ? 'ojo cerrado' : 'ojo abierto'}
+                        className="icono-ojo"
+                        tabIndex={0}
+                        onClick={() => setShowConfirmPassword(v => !v)}
+                    />
                 </div>
                 <div className="checkbox-guardar">
                     <input type="checkbox" id="guardar" name="guardar" />
@@ -108,7 +139,7 @@ export default function CrearCuenta() {
                 </div>
                 {registerError && <div className="email-error email-error-active">{registerError}</div>}
             </form>
-            <p>¿Ya tienes una cuenta? <strong style={{cursor:'pointer'}} onClick={() => navigate('/login')}>Iniciar sesión</strong></p>
+            <p id='tienesCuenta'>¿Ya tienes una cuenta? <strong onClick={() => navigate('/login')}>Iniciar sesión</strong></p>
             <Modal
                 isOpen={modal.isOpen}
                 onClose={closeModal}

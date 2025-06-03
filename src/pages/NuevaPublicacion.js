@@ -9,6 +9,7 @@ export default function NuevaPublicacion() {
     const [imagen, setImagen] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
+    const [publicacionCreada, setPublicacionCreada] = useState(false);
     const navigate = useNavigate();
 
     const handleImagenChange = (e) => {
@@ -29,14 +30,27 @@ export default function NuevaPublicacion() {
         // 1. Subir imagen al servidor
         const formData = new FormData();
         formData.append('imagen', imagen);
-        let imagenSubida = false;
+        let imagen_url = '';
         try {
             const resImg = await fetch('http://localhost:4000/img_lvup/upload', {
                 method: 'POST',
                 body: formData
             });
             if (resImg.ok) {
-                imagenSubida = true;
+                // Espera que el backend devuelva un JSON con la url de la imagen subida
+                const imgData = await resImg.json();
+                console.log(imgData);
+                localStorage.setItem("imgDataUrl", imgData.url)
+                localStorage.setItem("imgDataPath", imgData.path)
+                if (imgData && imgData.url) {
+                    imagen_url = imgData.url;
+                } else if (imgData && imgData.path) {
+                    imagen_url = imgData.path; // fallback si el backend usa 'path'
+                } else {
+                    setModalMsg('Error: el servidor no devolvió la URL de la imagen.');
+                    setModalOpen(true);
+                    return;
+                }
             } else {
                 setModalMsg('Error al subir la imagen.');
                 setModalOpen(true);
@@ -48,8 +62,7 @@ export default function NuevaPublicacion() {
             return;
         }
         // 2. Crear publicación si la imagen se subió correctamente
-        if (imagenSubida) {
-            const imagen_url = '/img_lvup/' + imagen.name;
+        if (imagen_url) {
             const body = {
                 titulo,
                 descripcion,
@@ -66,13 +79,10 @@ export default function NuevaPublicacion() {
                     body: JSON.stringify(body)
                 });
                 const data = await res.json();
-                if (data) {
+                if (data && data.mensaje) {
                     setModalMsg('¡Publicación creada con éxito!');
                     setModalOpen(true);
-                    setTimeout(() => {
-                        setModalOpen(false);
-                        navigate('/Posts');
-                    }, 1500);
+                    setPublicacionCreada(true);
                 } else {
                     setModalMsg('Error al crear la publicación.');
                     setModalOpen(true);
@@ -84,10 +94,19 @@ export default function NuevaPublicacion() {
         }
     };
 
-    return(
+    // Handler para cerrar el modal
+    const handleCloseModal = () => {
+        setModalOpen(false);
+        if (publicacionCreada) {
+            setPublicacionCreada(false);
+            navigate('/');
+        }
+    };
+
+    return (
         <div id="container" className="nueva-publicacion-container">
             <h2>Crear nueva publicación</h2>
-            <form className="form-publicacion" onSubmit={handleSubmit}>
+            <form className="form-publicacion" onSubmit={handleSubmit} autoComplete="off">
                 <label>Título:
                     <input type="text" value={titulo} onChange={e => setTitulo(e.target.value)} required maxLength={80} />
                 </label>
@@ -102,10 +121,10 @@ export default function NuevaPublicacion() {
                 </label>
                 <button type="submit" className="btn-principal">Crear publicación</button>
             </form>
-            <Modal 
-                isOpen={modalOpen} 
-                onClose={() => setModalOpen(false)} 
-                message={modalMsg} 
+            <Modal
+                isOpen={modalOpen}
+                onClose={handleCloseModal}
+                message={modalMsg}
             />
         </div>
     )

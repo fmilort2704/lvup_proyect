@@ -120,9 +120,9 @@ export default function EditarPublicacion() {
                 <label>Imagen de la publicación:
                     <input type="file" accept="image/*" onChange={handleImagenChange} />
                     {publicacion?.img_publicacion && (
-                        <div style={{marginTop: '0.5rem'}}>
+                        <div>
                             <span>Imagen actual:</span><br/>
-                            <img src={publicacion.img_publicacion} alt="imagen_publicacion" style={{maxWidth: 120, maxHeight: 120, borderRadius: 8}} />
+                            <img src={publicacion.img_publicacion} alt="imagen_publicacion" />
                         </div>
                     )}
                 </label>

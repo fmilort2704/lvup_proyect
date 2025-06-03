@@ -4,6 +4,7 @@
     align-items: center;
     gap: 0.5rem;
     padding: .5rem 0 0 .5rem;
+    cursor: pointer;
 }
 
 h1{
@@ -32,6 +33,7 @@ h1{
     align-items: center;
     gap: 0.5rem;
     position: relative;
+    z-index: 1000;
 }
 
 #search {
@@ -222,6 +224,99 @@ h1{
     font-size: inherit;
     font-weight: inherit;
     cursor: pointer;
+}
+
+#user-menu-bg{
+    z-index: 100000
+}
+
+#menuCtn{
+    height:1.5rem;
+}
+
+#inputSearch{
+     width: '80%';
+     padding: 0.7rem 1rem;
+     border-radius: 8;
+     border: 1.5px solid #18b6ff;
+     font-size: 1.1rem;
+     margin-bottom: 1rem;
+     outline: none;
+     margin-right: 2.5rem 
+}
+
+.productosBuscar{
+    padding: 0.5rem 0;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+#cruzBuscar{
+     position: absolute;
+     top: 1rem;
+     right: 1rem;
+     background: none;
+     border: none;
+     font-size: 2rem;
+     cursor: pointer;
+     color: var(--color-fondo-search); 
+}
+
+@media (min-width: 1010px) {
+    #menu_icon, #cruz_icon{
+        display: none;
+    }
+
+    #listaMenu{
+        margin-left: .3rem;
+        display: flex;
+        top: -160%;
+        left: 0;
+        width: 85vw;
+        height: 100%;
+        background-color: transparent;
+        box-shadow: none;
+        align-items: center;
+        z-index: 100;
+    }
+    #listaMenu li{
+        justify-content: center;
+        width: 16%;
+        position: relative; /* Necesario para posicionar el submenu respecto a este li */
+    }
+
+    /* Submenú aparece a la derecha de la pantalla, debajo del li Categoría */
+    #submenu {
+        display: none;
+        position: absolute;
+        left: 0%; /* Justo a la derecha del li */
+        top: 1.55rem;
+        min-width: 180px;
+        width: 7%;
+        background-color: var(--color-fondo-search);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        padding-left: 0.5rem;
+        z-index: 2000;
+        animation: fadeIn 0.3s;
+    }
+
+    #submenu li{
+        font-size: large;
+        width: 80%;
+        margin-left: -.2rem;
+        margin-bottom: .7rem;
+    }
+
+    .header-right {
+        display: flex;
+        gap: 1.2rem;         /* Más espacio entre login y carrito */
+    }
+    #s-sesion, #s-carrito, #s-search {
+        color: black;
+        display: inline;
+        font-size: 1.1rem;
+    }
+    
 }
 
 @keyframes fadeIn {

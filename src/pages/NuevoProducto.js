@@ -108,7 +108,7 @@ export default function NuevoProducto() {
                     setModalOpen(true);
                     setTimeout(() => {
                         setTimeout(() => {
-                            navigate('/Administracion');
+                            navigate('/');
                         }, 1500);
                     }, 1500);
                 } else {
@@ -157,13 +157,13 @@ export default function NuevoProducto() {
                             <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)} required />
                         </label>
                         <label>Fecha de salida:
-                            <input type="date" value={fechaSalida} onChange={e => setFechaSalida(e.target.value)} required />
+                            <input type="date" min="1990-01-01" value={fechaSalida} onChange={e => setFechaSalida(e.target.value)} required />
                         </label>
                         <label>Empresa:
                             <input type="text" value={empresa} onChange={e => setEmpresa(e.target.value)} required maxLength={80} />
                         </label>
                         <label>Pegi:
-                            <select value={pegi} onChange={e => setPegi(e.target.value)} required>
+                            <select value={pegi} onChange={e => setPegi(e.target.value)}>
                                 <option value="">Selecciona PEGI</option>
                                 <option value="3">3</option>
                                 <option value="7">7</option>

@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useUser } from '../context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import Modal from '../components/Modal';
+import { useNavigate } from 'react-router-dom';
+
 
 export default function EditarPerfil() {
     const [nombre, setNombre] = useState("");
@@ -14,6 +17,8 @@ export default function EditarPerfil() {
     const [emailError, setEmailError] = useState("");
     const [passwordError, setPasswordError] = useState("");
     const { login } = useUser();
+    const navigate = useNavigate();
+
 
     // Para elegir qué campos editar
     const [step, setStep] = useState(1);
@@ -25,6 +30,11 @@ export default function EditarPerfil() {
 
     // Guardar datos actuales del usuario
     const [datosActuales, setDatosActuales] = useState({});
+
+    // Estado para el modal
+    const [modalOpen, setModalOpen] = useState(false);
+    const [modalMessage, setModalMessage] = useState("");
+    const [modalType, setModalType] = useState("info");
 
     useEffect(() => {
         // Obtener datos actuales del usuario al cargar el componente
@@ -63,20 +73,22 @@ export default function EditarPerfil() {
             setPasswordError("Las contraseñas nuevas no coinciden");
             return;
         }
-
         const id_usuario = localStorage.getItem('id_usuario');
         if (!id_usuario) {
             setError("No se ha encontrado el usuario");
+            setModalMessage("No se ha encontrado el usuario");
+            setModalType("info");
+            setModalOpen(true);
             return;
         }
-
         // Comprobar contraseña antigua
         const emailToCheck = localStorage.getItem('email');
         const loginResult = await login(emailToCheck, oldPassword);
-        console.log(emailToCheck)
-        console.log(oldPassword)
         if (!loginResult.usuario) {
             setError("La contraseña actual no es correcta");
+            setModalMessage("La contraseña actual no es correcta");
+            setModalType("info");
+            setModalOpen(true);
             return;
         }
 
@@ -100,10 +112,6 @@ export default function EditarPerfil() {
             body.email = localStorage.getItem('email');
         }
 
-        console.log(body.nombre)
-        console.log(body.email)
-        console.log(body.contrasenya)
-
         fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_usuario/${id_usuario}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -114,16 +122,28 @@ export default function EditarPerfil() {
                 if (data.mensaje) {
                     setSuccess("Datos actualizados correctamente");
                     setError("");
+                    setModalMessage("Datos actualizados correctamente");
+                    setModalType("info");
+                    setModalOpen(true);
                     localStorage.setItem('nombre', body.nombre);
                     localStorage.setItem('email', body.email);
+                    setTimeout(() => {
+                        navigate('/');
+                    }, 1500);
                 } else {
                     setError(data.mensaje || "Error al actualizar el usuario");
                     setSuccess("");
+                    setModalMessage(data.mensaje || "Error al actualizar el usuario");
+                    setModalType("info");
+                    setModalOpen(true);
                 }
             })
             .catch((e) => {
                 setError("Error de conexión con el servidor: " + e);
                 setSuccess("");
+                setModalMessage("Error de conexión con el servidor: " + e);
+                setModalType("info");
+                setModalOpen(true);
             });
     }
 
@@ -246,9 +266,15 @@ export default function EditarPerfil() {
                     </>
                 )}
                 <button type="submit">Guardar cambios</button>
-                {error && <div className="email-error email-error-active">{error}</div>}
-                {success && <div className="email-success email-error-active">{success}</div>}
+                {/* Eliminamos mensajes inline, ahora van en modal */}
             </form>
+            <Modal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                title={modalType === 'info' ? 'Información' : ''}
+                message={modalMessage}
+                type="info"
+            />
         </div>
     );
 }

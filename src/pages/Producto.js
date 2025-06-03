@@ -18,11 +18,23 @@ export default function Producto() {
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
         if (!usuario_id) {
+            // Usuario no logueado: manejar carrito en localStorage
+            let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
+            // Buscar el producto en la lista de productos
+            const producto = productos.find(p => p.id_producto === producto_id);
+            if (!producto) return;
+            const idx = carrito.findIndex(p => p.id_producto === producto_id);
+            if (idx !== -1) {
+                carrito[idx].cantidad += 1;
+            } else {
+                carrito.push({ ...producto, cantidad: 1 });
+            }
+            localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
             setModal({
                 isOpen: true,
-                title: 'Sesión requerida',
-                message: 'Debes iniciar sesión para añadir productos al carrito',
-                type: 'warning'
+                title: '¡Producto añadido!',
+                message: 'El producto se ha añadido correctamente al carrito',
+                type: 'success'
             });
             return;
         }
@@ -64,7 +76,8 @@ export default function Producto() {
     };
 
     const handlePagar = () => {
-        navigate('/pasarela', { state: { precio: producto.precio, cantidad: 1, nombre: producto.nombre } });
+
+        navigate('/pasarela', { state: { id_producto: id_producto, precio: producto.precio, cantidad: 1, nombre: producto.nombre, vendedor_id: producto.vendedor_id } });
     };
 
     const closeModal = () => {
@@ -99,9 +112,12 @@ export default function Producto() {
         <div id='container'>
             <div id='detallesProducto'>
                 <div id='detallesProducto-fl'>
-                    <img src={producto.imagen_url} alt='img_producto' />
+                    <img src={producto.imagen_url} alt='img_producto' id='imgProducto'/>
                     <div className="info-texto">
-                        <h2>{producto.nombre}</h2>
+                        <div id='prodTit'>
+                            <h2>{producto.nombre}</h2>
+
+                        </div>
                         <div id='detallesProducto-sl'>
                             {producto.estado === 'segunda_mano' ? (
                                 <>
@@ -109,7 +125,7 @@ export default function Producto() {
                                         <h3>Usuario:</h3>
                                         <p>
                                             <Link className='link' to='/Valoraciones' state={{ id_usuario: producto.vendedor_id }}>
-                                                    {producto.nombre_usuario || producto.usuario || 'Usuario desconocido'}
+                                                {producto.nombre_usuario || producto.usuario || 'Usuario desconocido'}
                                             </Link>
                                         </p>
                                     </div>
@@ -138,11 +154,19 @@ export default function Producto() {
                             </div>
                         )}
                     </div>
+                    <div>
+                        <img
+                            id='anyadirCarrito'
+                            src={addCarrito}
+                            alt='carrito'
+                            onClick={() => handleAddToCart(producto.id_producto)}
+                        />
+                    </div>
                 </div>
                 <div id='descripcion'>
                     {producto.descripcion_larga}
                 </div>
-                <div id='pago'>
+                <div id='pago-producto'>
                     <div>
                         <div id='precio'>
                             {producto.precio} €
@@ -157,54 +181,54 @@ export default function Producto() {
                                 <p>Pay</p>
                             </button>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <div id='comprarCtn'>
                             <button id='comprar' onClick={handlePagar}>Comprar ahora</button>
                         </div>
                     </div>
-                    <img
-                        id='anyadirCarrito'
-                        src={addCarrito}
-                        alt='añadir carrito'
-                        style={{ marginLeft: '1rem', cursor: 'pointer' }}
-                        onClick={() => handleAddToCart(producto.id_producto)}
-                    />
                 </div>
             </div>
             <div id='otrosProductos'>
                 <h2>Otros productos</h2>
-                {productos
-                    .filter(p => String(p.id_producto) !== String(id_producto)) // Excluye el producto principal
-                    .sort(() => Math.random() - 0.5)
-                    .slice(0, 4)
-                    .map(producto => (
-                        <div key={producto.id} className="tarjeta-producto">
-                            <div className="productos">
-                                <div id='f-line-producto'>
-                                    <img src={producto.imagen_url} alt={producto.nombre} />
-                                    <div className="producto-info">
-                                        <div className="producto-header">
-                                            <h3>
-                                                <Link
-                                                    className='link'
-                                                    to={`/producto`}
-                                                    state={{ id_producto: producto.id_producto }}
-                                                >
-                                                    {producto.nombre}
-                                                </Link>
-                                            </h3>
+                <div className="productos">
+                    {productos.length > 0 &&
+                        productos
+                            .sort(() => Math.random() - 0.5)
+                            .slice(0, 4)
+                            .map(producto => (
+                                <div key={producto.id_producto} className="tarjeta-producto">
+                                    <div className="productos">
+                                        <div id='f-line-producto'>
+                                            <img src={producto.imagen_url} alt={producto.nombre} />
+                                            <div className="producto-info">
+                                                <div className="producto-header">
+                                                    <h3>
+                                                        <Link
+                                                            className='link'
+                                                            to={`/producto`}
+                                                            state={{ id_producto: producto.id_producto }}
+                                                        >
+                                                            {producto.nombre}
+                                                        </Link>
+                                                    </h3>
+                                                </div>
+                                                <p>{producto.descripcion}</p>
+                                                <p className="precio">Desde {producto.precio}€</p>
+                                            </div>
+                                            <img
+                                                id='addCarritoIcon'
+                                                onClick={() => handleAddToCart(producto.id_producto)}
+                                                src={addCarrito}
+                                                alt='carrito'
+
+                                            />
+                                            <button id='addCarritoBtn' onClick={() => handleAddToCart(producto.id_producto)}>
+                                                Añadir a la cesta
+                                            </button>
                                         </div>
-                                        <p>{producto.descripcion}</p>
-                                        <p className="precio">Desde {producto.precio}€</p>
                                     </div>
-                                    <img
-                                        onClick={() => handleAddToCart(producto.id_producto)}
-                                        src={addCarrito}
-                                        alt='carrito'
-                                        style={{ cursor: 'pointer' }}
-                                    />
                                 </div>
-                            </div>
-                        </div>))}
+                            ))}
+                </div>
             </div>
             <Modal
                 isOpen={modal.isOpen}

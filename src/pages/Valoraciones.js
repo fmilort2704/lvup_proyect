@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import user_icon from '../assets/Iconos/icono_login.svg';
 
@@ -21,6 +21,7 @@ export default function Valoraciones() {
     const [modal, setModal] = useState({ isOpen: false, message: '', type: 'info' });
     const [loading, setLoading] = useState(true);
     const id_usuario_logueado = localStorage.getItem('id_usuario');
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!id_usuario) return;
@@ -39,10 +40,6 @@ export default function Valoraciones() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!nuevaValoracion.trim()) {
-            setModal({ isOpen: true, message: 'La valoración no puede estar vacía', type: 'warning' });
-            return;
-        }
         if (!id_usuario_logueado) {
             setModal({ isOpen: true, message: 'Debes iniciar sesión para valorar', type: 'warning' });
             return;
@@ -53,20 +50,37 @@ export default function Valoraciones() {
         }
         try {
             let res, data;
-            if (id_post) {
-                // Valoración sobre publicación
-                res = await fetch('http://localhost/Proyectos/LvUp_backend/api/editar_valoracion_publicacion', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        valorado_id: id_usuario,
-                        valorador_id: id_usuario_logueado,
-                        comentario: nuevaValoracion,
-                        puntuacion,
-                        post_id: id_post
-                    })
-                });
+            console.log(post);
+            if (post) {
+                // Obtener puntuacion y numVal actuales de la publicación
+                const puntuacionActual = parseFloat(post.puntuacion) || 0;
+                const numVal = parseInt(post.numVal) || 0;
+                console.log(puntuacionActual);
+                console.log(numVal);
+                // Calcular nueva media
+                const nuevaMedia = Math.round((puntuacionActual * numVal + puntuacion) / (numVal + 1));
+                // Actualizar publicación con la nueva media y numVal + 1
+                console.log(nuevaMedia);
+                console.log(numVal);
+                try {
+                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/editar_valoracion_publicacion/${post.id_post}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ puntuacion: nuevaMedia, numVal: numVal + 1 })
+                    });
+                    setModal({ isOpen: true, message: '¡Valoración enviada!', type: 'success' });
+                    setTimeout(() => {
+                        navigate('/posts');
+                    }, 2000);
+                } catch (e) {
+                    console.log(e)
+                }
+                setPuntuacion(5);
             } else {
+                if (!nuevaValoracion.trim()) {
+                    setModal({ isOpen: true, message: 'La valoración no puede estar vacía', type: 'warning' });
+                    return;
+                }
                 // Valoración normal de usuario
                 res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_valoracion', {
                     method: 'POST',
@@ -78,18 +92,18 @@ export default function Valoraciones() {
                         puntuacion
                     })
                 });
-            }
-            data = await res.json();
-            if (data.mensaje) {
-                setModal({ isOpen: true, message: '¡Valoración enviada!', type: 'success' });
-                setNuevaValoracion('');
-                setPuntuacion(5);
-                // Recargar valoraciones
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_valoraciones_usuario/${id_usuario}`)
-                    .then(res => res.json())
-                    .then(data => setValoraciones(data.valoraciones || []));
-            } else {
-                setModal({ isOpen: true, message: data.error || 'Error al enviar valoración', type: 'error' });
+                data = await res.json();
+                if (data.mensaje) {
+                    setModal({ isOpen: true, message: '¡Valoración enviada!', type: 'success' });
+                    setNuevaValoracion('');
+                    setPuntuacion(5);
+                    // Recargar valoraciones
+                    setTimeout(() => {
+                        navigate('/posts');
+                    }, 2000);
+                } else {
+                    setModal({ isOpen: true, message: data.error || 'Error al enviar valoración', type: 'error' });
+                }
             }
         } catch {
             setModal({ isOpen: true, message: 'Error de red', type: 'error' });
@@ -105,6 +119,18 @@ export default function Valoraciones() {
                     <img src={user_icon} alt='icono_usuario' />
                     <span>{post.nombre}</span>
                     <span>{post.descripcion}</span>
+                    {localStorage.getItem("id_usuario") && (
+                        <form className="form-valoracion" onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
+                            <h3>Deja tu valoración</h3>
+                            <label>Puntuación:
+                                <select value={puntuacion} onChange={e => setPuntuacion(Number(e.target.value))}>
+                                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} ★</option>)}
+                                </select>
+                            </label>
+                            {/* No mostrar textarea de comentario en valoracion de publicacion */}
+                            <button type="submit">Enviar valoración</button>
+                        </form>
+                    )}
                 </div>
             ) : (
                 <>
@@ -120,22 +146,21 @@ export default function Valoraciones() {
                                 ))}
                             </ul>
                     )}
+                    {localStorage.getItem("id_usuario") && (
+                        <form className="form-valoracion" onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
+                            <h3>Deja tu valoración</h3>
+                            <label>Puntuación:
+                                <select value={puntuacion} onChange={e => setPuntuacion(Number(e.target.value))}>
+                                    {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} ★</option>)}
+                                </select>
+                            </label>
+                            <label>Comentario:
+                                <textarea value={nuevaValoracion} onChange={e => setNuevaValoracion(e.target.value)} maxLength={300} required rows={3} />
+                            </label>
+                            <button type="submit">Enviar valoración</button>
+                        </form>
+                    )}
                 </>
-            )}
-
-            {localStorage.getItem("id_usuario") && (
-                <form className="form-valoracion" onSubmit={handleSubmit} style={{ marginTop: '2rem' }}>
-                    <h3>Deja tu valoración</h3>
-                    <label>Puntuación:
-                        <select value={puntuacion} onChange={e => setPuntuacion(Number(e.target.value))}>
-                            {[5, 4, 3, 2, 1].map(n => <option key={n} value={n}>{n} ★</option>)}
-                        </select>
-                    </label>
-                    <label>Comentario:
-                        <textarea value={nuevaValoracion} onChange={e => setNuevaValoracion(e.target.value)} maxLength={300} required rows={3} />
-                    </label>
-                    <button type="submit">Enviar valoración</button>
-                </form>
             )}
             <Modal isOpen={modal.isOpen} onClose={() => setModal({ ...modal, isOpen: false })} message={modal.message} type={modal.type} />
         </div>

@@ -67,7 +67,9 @@ app.post('/img_lvup/upload', upload.single('imagen'), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ success: false, error: 'No se recibió ninguna imagen.' });
   }
-  res.json({ success: true, filename: req.file.filename });
+  // Construir la URL pública de la imagen subida
+  const url = `/img_lvup/${req.file.filename}`;
+  res.json({ success: true, filename: req.file.filename, url });
 });
 
 // Endpoint para eliminar imagen

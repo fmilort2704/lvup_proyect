@@ -32,25 +32,46 @@ export default function Home() {
   const handleAddToCart = async (producto_id) => {
     const usuario_id = localStorage.getItem('id_usuario');
     if (!usuario_id) {
+      // Usuario no logueado: manejar carrito en localStorage
+      let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
+      // Si el producto ya está en el carrito, incrementar cantidad
+      const idx = carrito.findIndex(p => p.id_producto === producto_id);
+      if (idx !== -1) {
+        carrito[idx].cantidad += 1;
+      } else {
+        // Buscar el producto en la lista de productos
+        const producto = productos.find(p => p.id_producto === producto_id);
+        if (producto) {
+          carrito.push({ ...producto, cantidad: 1 });
+        }
+      }
+      localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
       setModal({
         isOpen: true,
-        title: 'Sesión requerida',
-        message: 'Debes iniciar sesión para añadir productos al carrito',
-        type: 'warning'
+        title: '¡Producto añadido!',
+        message: 'El producto se ha añadido correctamente al carrito',
+        type: 'success'
       });
       return;
     }
+
+    const body = {
+      usuario_id: usuario_id,
+      producto_id: producto_id
+    };
 
     try {
       const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: `usuario_id=${usuario_id}&producto_id=${producto_id}`
+        body: JSON.stringify(body)
       });
 
       const data = await response.json();
+
+      console.log(data)
       if (data.mensaje) {
         setModal({
           isOpen: true,
@@ -67,7 +88,7 @@ export default function Home() {
         });
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.log('Error:', error);
       setModal({
         isOpen: true,
         title: 'Error de conexión',
@@ -89,16 +110,20 @@ export default function Home() {
           const response = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_categoria/${categoriaToId[categoriaSeleccionada]}`);
           if (!response.ok) throw new Error('Error al cargar los productos de la categoría');
           data = await response.json();
-          setProductos(data.productos);
+          // Filtrar productos con stock > 0
+          const productosFiltrados = (data.productos || []).filter(producto => producto.stock > 0);
+          setProductos(productosFiltrados);
           setNuevosProductos([]);
           setProductosSegundaMano([]);
         } else {
           const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos');
           if (!response.ok) throw new Error('Error al cargar los productos');
           data = await response.json();
-          setProductos(data.productos);
-          const nuevos = data.productos.filter(producto => producto.estado === "nuevo");
-          const segundaMano = data.productos.filter(producto => producto.estado === "segunda_mano");
+          // Filtrar productos con stock > 0
+          const productosConStock = (data.productos || []).filter(producto => producto.stock > 0);
+          setProductos(productosConStock);
+          const nuevos = productosConStock.filter(producto => producto.estado === "nuevo");
+          const segundaMano = productosConStock.filter(producto => producto.estado === "segunda_mano");
           setNuevosProductos(nuevos);
           setProductosSegundaMano(segundaMano);
         }
@@ -129,7 +154,7 @@ export default function Home() {
       <div className="productos">
         {(categoriaSeleccionada ? productosFiltrados : nuevosProductos).map(producto => (
           <div key={producto.id} className="tarjeta-producto">
-            <div className="productos">
+            <div className="producto">
               <div id='f-line-producto'>
                 <img src={producto.imagen_url} alt={producto.nombre} />
                 <div className="producto-info">
@@ -148,50 +173,58 @@ export default function Home() {
                   <p className="precio">Desde {producto.precio}€</p>
                 </div>
                 <img
-                      onClick={() => handleAddToCart(producto.id_producto)}
-                      src={addCarrito}
-                      alt='carrito'
-                      style={{ cursor: 'pointer' }}
-                    />
+                  id='addCarritoIcon'
+                  onClick={() => handleAddToCart(producto.id_producto)}
+                  src={addCarrito}
+                  alt='carrito'
+
+                />
+                <button id='addCarritoBtn' onClick={() => handleAddToCart(producto.id_producto)}>
+                  Añadir a la cesta
+                </button>
               </div>
             </div>
           </div>
         ))}
       </div>
       {!categoriaSeleccionada && <>
-      <h2>Productos de Segunda mano</h2>
-      <div className="productos">
-        {productosSegundaMano.map(producto => (
-          <div key={producto.id} className="tarjeta-producto">
-            <div className="productos">
-              <div id='f-line-producto'>
-                <img src={producto.imagen_url} alt={producto.nombre} />
-                <div className="producto-info">
-                  <div className="producto-header">
-                    <h3>
-                      <Link
-                        className='link'
-                        to={`/producto`}
-                        state={{ id_producto: producto.id_producto }}
-                      >
-                        {producto.nombre}
-                      </Link>
-                    </h3>
+        <h2>Productos de Segunda mano</h2>
+        <div className="productos">
+          {productosSegundaMano.map(producto => (
+            <div key={producto.id} className="tarjeta-producto">
+              <div className="productos">
+                <div id='f-line-producto'>
+                  <img src={producto.imagen_url} alt={producto.nombre} />
+                  <div className="producto-info">
+                    <div className="producto-header">
+                      <h3>
+                        <Link
+                          className='link'
+                          to={`/producto`}
+                          state={{ id_producto: producto.id_producto }}
+                        >
+                          {producto.nombre}
+                        </Link>
+                      </h3>
+                    </div>
+                    <p>{producto.descripcion}</p>
+                    <p className="precio">Desde {producto.precio}€</p>
                   </div>
-                  <p>{producto.descripcion}</p>
-                  <p className="precio">Desde {producto.precio}€</p>
+                  <img
+                    id='addCarritoIcon'
+                    onClick={() => handleAddToCart(producto.id_producto)}
+                    src={addCarrito}
+                    alt='carrito'
+
+                  />
+                  <button id='addCarritoBtn' onClick={() => handleAddToCart(producto.id_producto)}>
+                    Añadir a la cesta
+                  </button>
                 </div>
-                <img
-                      onClick={() => handleAddToCart(producto.id_producto)}
-                      src={addCarrito}
-                      alt='carrito'
-                      style={{ cursor: 'pointer' }}
-                    />
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
       </>
       }
       <Modal

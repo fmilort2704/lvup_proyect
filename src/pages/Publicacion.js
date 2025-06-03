@@ -1,24 +1,38 @@
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/estilos.css';
-import { usePublicaciones } from '../context/PublicacionesContext';
+import Modal from '../components/Modal';
 
 export default function Publicacion() {
     const location = useLocation();
-    const { posts } = usePublicaciones();
-    const post = location.state?.post;
+    // Intenta obtener el id_post desde location.state o desde la URL
+    const id_post = location.state?.post?.id_post || location.state?.id_post;
 
+    const [post, setPost] = useState(null);
     const [comentarios, setComentarios] = useState([]);
     const [comentariosLoading, setComentariosLoading] = useState(true);
     const [comentariosError, setComentariosError] = useState(null);
     const [nuevoComentario, setNuevoComentario] = useState('');
     const [enviando, setEnviando] = useState(false);
+    const [otrasPublicaciones, setOtrasPublicaciones] = useState([]);
+    const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
 
+    // Obtener datos de la publicación
     useEffect(() => {
-        if (!post?.id_post) return;
+        if (!id_post) return;
+        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_post/${id_post}`)
+            .then(res => res.json())
+            .then(data => {
+                setPost(data.post);
+            });
+    }, [id_post]);
+
+    // Obtener comentarios
+    useEffect(() => {
+        if (!id_post) return;
         setComentariosLoading(true);
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentario_de_post/${post.id_post}`)
+        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentario_de_post/${id_post}`)
             .then(res => {
                 if (!res.ok) throw new Error('Error al obtener comentarios');
                 return res.json();
@@ -31,7 +45,18 @@ export default function Publicacion() {
                 setComentariosError(err.message);
                 setComentariosLoading(false);
             });
-    }, [post]);
+    }, [id_post]);
+
+    // Obtener otras publicaciones (sin context)
+    useEffect(() => {
+        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_posts')
+            .then(res => res.json())
+            .then(data => {
+                // Filtra para no mostrar la publicación actual
+                const publicaciones = Array.isArray(data) ? data : data.posts || [];
+                setOtrasPublicaciones(publicaciones.filter(p => String(p.id_post) !== String(id_post)));
+            });
+    }, [id_post]);
 
     function tiempoTranscurrido(fechaIso) {
         if (!fechaIso) return '';
@@ -56,10 +81,7 @@ export default function Publicacion() {
     const handleComentar = async () => {
         if (!nuevoComentario.trim()) return;
         const autor_id = localStorage.getItem('id_usuario');
-        if (!autor_id || !post?.id_post) return;
-        console.log(autor_id);
-        console.log(nuevoComentario);
-        console.log(post.id_post);
+        if (!autor_id || !id_post) return;
 
         setEnviando(true);
         try {
@@ -68,7 +90,7 @@ export default function Publicacion() {
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({
                     contenido: nuevoComentario,
-                    post_id: post.id_post,
+                    post_id: id_post,
                     autor_id: autor_id
                 })
             });
@@ -77,7 +99,7 @@ export default function Publicacion() {
                 // Recargar comentarios tras comentar
                 setNuevoComentario('');
                 setComentariosLoading(true);
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentario_de_post/${post.id_post}`)
+                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentario_de_post/${id_post}`)
                     .then(res => res.json())
                     .then(data => {
                         setComentarios(Array.isArray(data) ? data : data.comentarios || []);
@@ -102,9 +124,24 @@ export default function Publicacion() {
                         <img src={icon_login} alt='icono_usuario' />
                         <h2>
                             {post.autor_id ? (
-                                <Link className='link' to='/Valoraciones' state={{ id_usuario: post.autor_id }}>
+                                <span
+                                    className='link'
+                                    style={{ cursor: 'pointer', color: '#007bff', textDecoration: 'underline' }}
+                                    onClick={() => {
+                                        if (!localStorage.getItem('id_usuario')) {
+                                            setModal({
+                                                isOpen: true,
+                                                title: 'Acceso restringido',
+                                                message: 'Debes registrarte para crear un producto o una publicación',
+                                                type: 'warning'
+                                            });
+                                        } else {
+                                            window.location.href = '/Valoraciones?id_usuario=' + post.autor_id;
+                                        }
+                                    }}
+                                >
                                     {post.nombre}
-                                </Link>
+                                </span>
                             ) : post.nombre}
                         </h2>
                     </div>
@@ -161,8 +198,8 @@ export default function Publicacion() {
                 <div id='lat_der'>
                     <h2>Otras publicaciones</h2>
                     <div className='publicaciones'>
-                        {posts && posts.length > 0 ? (
-                            posts.map((p, idx) => (
+                        {otrasPublicaciones && otrasPublicaciones.length > 0 ? (
+                            otrasPublicaciones.map((p, idx) => (
                                 <div className='tarjeta_publicaciones' key={p.id_post || idx} style={{ margin: '1rem 0' }}>
                                     <img src={p.img_publicacion} alt='imagen_publicacion' />
                                     <h3>{p.titulo}</h3>
@@ -177,6 +214,13 @@ export default function Publicacion() {
                     </div>
                 </div>
             </div>
+            <Modal
+                isOpen={modal.isOpen}
+                onClose={() => setModal({ ...modal, isOpen: false })}
+                title={modal.title}
+                message={modal.message}
+                type={modal.type}
+            />
         </div>
     );
 }

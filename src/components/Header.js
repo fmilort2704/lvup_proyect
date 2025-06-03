@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import logo from '../assets/Iconos/LvUp_icon.svg';
 import user from '../assets/Iconos/lucide--user.svg';
 import carrito from '../assets/Iconos/prime--cart-arrow-down.svg';
@@ -10,6 +10,7 @@ import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/Header.css';
 import { Link, useNavigate } from 'react-router-dom';
 import { useProductos } from '../context/ProductosContext';
+import Modal from './Modal'; // Asegúrate de que la ruta sea correcta
 
 export default function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -18,6 +19,7 @@ export default function Header() {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [filtered, setFiltered] = useState([]);
+    const [modal, setModal] = useState({ isOpen: false });
     const searchInputRef = useRef(null);
     const navigate = useNavigate();
 
@@ -59,53 +61,81 @@ export default function Header() {
         setSearchValue('');
         setFiltered([]);
     };
+    // Redirección protegida para crear publicación/producto
+    const handleProtectedNavigate = (path) => {
+        if (!isLogged) {
+            setModal({
+                isOpen: true,
+                title: 'Acceso restringido',
+                message: 'Debes registrarte para crear un producto o una publicación',
+                type: 'warning'
+            });
+            return;
+        }
+        navigate(path);
+    };
+
+    useEffect(() => {
+        const handleCloseMenus = () => {
+            setMenuOpen(false);
+            setSubmenuOpen(false);
+        };
+        window.addEventListener('scroll', handleCloseMenus);
+        window.addEventListener('resize', handleCloseMenus);
+        return () => {
+            window.removeEventListener('scroll', handleCloseMenus);
+            window.removeEventListener('resize', handleCloseMenus);
+        };
+    }, []);
 
     return (
         <header className="p-4 bg-blue-600">
             <div id='header'>
-                <div id='logo'>
+                <div id='logo' onClick={() => navigate('/')}>
                     <img src={logo} alt="LvUp Logo" className="h-10" />
                     <h1>LvUp</h1>
                 </div>
                 <div className="header-right">
-                    <div id='login' style={{ position: 'relative' }}>
+                    <div id='login'>
                         {isLogged ? (
                             <>
                                 <img
                                     src={icon_login}
                                     alt='user'
-                                    style={{ cursor: 'pointer' }}
                                     onClick={() => setShowUserMenu(v => !v)}
                                 />
+                                <span id='s-sesion' onClick={() => setShowUserMenu(v => !v)}>Ver perfil</span>
                                 {showUserMenu && (
-                                    <div id='user-menu'>
-                                        <div><strong>Nombre: </strong>{nombre}</div>
-                                        <div><strong>Gmail: </strong> {gmail}</div>
-                                        <div><strong>Puntos: </strong>{puntos}</div>
-                                        <div id='botones_perfil'>
-                                            <Link to={"/Editar"} onClick={() => setShowUserMenu(false)}>
-                                                <button>
-                                                    Editar perfil
+                                    <div id='user-menu-bg' onClick={() => setShowUserMenu(false)}>
+                                        <div id='user-menu' onClick={e => e.stopPropagation()}>
+                                            <img src={cruz} alt='cerrar' className='close-modal' onClick={() => setShowUserMenu(false)} />
+                                            <div><strong>Nombre: </strong>{nombre}</div>
+                                            <div><strong>Gmail: </strong> {gmail}</div>
+                                            <div><strong>Puntos: </strong>{puntos}</div>
+                                            <div id='botones_perfil'>
+                                                <Link to={"/Editar"} onClick={() => setShowUserMenu(false)}>
+                                                    <button>
+                                                        Editar perfil
+                                                    </button>
+                                                </Link>
+                                                <Link to="/Administracion" onClick={() => setShowUserMenu(false)}>
+                                                    <button>
+                                                        Panel Admin
+                                                    </button>
+                                                </Link>
+                                                <button onClick={() => {
+                                                    localStorage.removeItem('id_usuario');
+                                                    localStorage.removeItem('nombre');
+                                                    localStorage.removeItem('email');
+                                                    localStorage.removeItem('puntos');
+                                                    localStorage.removeItem('verificado');
+                                                    localStorage.removeItem('rol');
+                                                    setShowUserMenu(false);
+                                                    window.location.href = '/';
+                                                }}>
+                                                    Cerrar sesión
                                                 </button>
-                                            </Link>
-                                            <Link to="/Administracion" onClick={() => setShowUserMenu(false)}>
-                                                <button>
-                                                    Panel Admin
-                                                </button>
-                                            </Link>
-                                            <button onClick={() => {
-                                                localStorage.removeItem('id_usuario');
-                                                localStorage.removeItem('nombre');
-                                                localStorage.removeItem('email');
-                                                localStorage.removeItem('puntos');
-                                                localStorage.removeItem('verificado');
-                                                localStorage.removeItem('rol');
-                                                setShowUserMenu(false);
-                                                window.location.href = '/';
-                                            }}>
-                                                Cerrar sesión
-                                            </button>
-
+                                            </div>
                                         </div>
                                     </div>
                                 )}
@@ -127,30 +157,31 @@ export default function Header() {
             </div>
             <div id='searchBar'>
                 <div id='menu'>
-                    <div style={{ position: 'relative', width: '24px', height: '24px' }}>
+                    <div id='menuCtn'>
                         <img
+                            id='menu_icon'
                             src={menu}
                             alt='menu'
                             onClick={toggleMenu}
                             className={`menu-icon menu ${menuOpen ? 'slide-out' : 'slide-in'}`}
-                            style={{ position: 'absolute' }}
                         />
                         <img
+                            id='cruz_icon'
                             src={cruz}
                             alt='cerrar menu'
                             onClick={toggleMenu}
                             className={`menu-icon cruz ${menuOpen ? 'slide-in' : 'slide-out'}`}
-                            style={{ position: 'absolute' }}
                         />
                     </div>
                     <ul id='listaMenu' className={menuOpen ? 'menu-open' : ''}>
                         <li onClick={() => { setMenuOpen(false); navigate('/'); }}>Inicio</li>
                         <li onClick={() => { setMenuOpen(false); navigate('/Posts'); }}>Publicaciones</li>
-                        <li onClick={() => { setMenuOpen(false); navigate('/NuevaPublicacion'); }}>Crear Publicación</li>
-                        <li onClick={() => { setMenuOpen(false); navigate('/NuevoProducto'); }}>Crear Producto</li>
+                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevaPublicacion'); }}>Crear Publicación</li>
+                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevoProducto'); }}>Crear Producto</li>
                         <li>
                             Categorias
                             <img
+                                id='flecha_icon'
                                 src={flecha}
                                 alt='flecha'
                                 onClick={toggleSubmenu}
@@ -166,33 +197,41 @@ export default function Header() {
                     </ul>
                 </div>
                 <div id='search'>
-                    <img src={search} alt='lupa' style={{ cursor: 'pointer' }} onClick={handleSearchClick} />
-                    <span id='s-search' onClick={handleSearchClick} style={{ cursor: 'pointer' }}>Buscar</span>
+                    <img src={search} alt='lupa' onClick={handleSearchClick} />
+                    <span id='s-search' onClick={handleSearchClick}>Buscar</span>
                     {searchOpen && (
                         <div className="search-modal" onClick={handleCloseSearch}>
                             <div className="search-modal-content" onClick={e => e.stopPropagation()}>
                                 <input
                                     ref={searchInputRef}
+                                    id='inputSearch'
                                     type="text"
                                     placeholder="Buscar producto..."
                                     value={searchValue}
                                     onChange={handleSearchChange}
-                                    style={{ width: '80%', minWidth: 180, maxWidth: 260, padding: '0.7rem 1rem', borderRadius: 8, border: '1.5px solid #18b6ff', fontSize: '1.1rem', marginBottom: '1rem', outline: 'none', marginRight: '2.5rem' }}
                                 />
-                                <div style={{ flex: 1, maxHeight: 220, overflowY: 'auto' }}>
-                                    {searchValue && filtered.length === 0 && <div style={{ color: '#888' }}>No hay resultados</div>}
+                                <div>
+                                    {searchValue && filtered.length === 0 && <div>No hay resultados</div>}
                                     {filtered.map(producto => (
-                                        <div key={producto.id_producto} style={{ padding: '0.5rem 0', cursor: 'pointer', borderBottom: '1px solid #eee' }} onClick={() => handleSelectProduct(producto)}>
+                                        <div key={producto.id_producto} className='productosBuscar' onClick={() => handleSelectProduct(producto)}>
                                             {producto.nombre}
                                         </div>
                                     ))}
                                 </div>
-                                <button onClick={handleCloseSearch} style={{ position: 'absolute', top: 10, right: 10, background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#18b6ff' }}>×</button>
+                                <button id='cruzBuscar' onClick={handleCloseSearch}>×</button>
                             </div>
                         </div>
                     )}
                 </div>
             </div>
+            {/* Modal para avisar si no está logueado */}
+            <Modal
+                isOpen={modal?.isOpen}
+                onClose={() => setModal({ ...modal, isOpen: false })}
+                title={modal?.title}
+                message={modal?.message}
+                type={modal?.type || 'info'}
+            />
         </header>
     )
 }

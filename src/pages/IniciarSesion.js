@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ojo from '../assets/Iconos/basil--eye-outline.svg';
+import ojo_cerradp from '../assets/Iconos/mdi--eye-closed.svg';
 
 
 export default function InciarSesion({ onLogin }) {
     const [emailError, setEmailError] = useState("");
     const [loginError, setLoginError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     function handleSubmit(e) {
@@ -77,8 +79,14 @@ export default function InciarSesion({ onLogin }) {
                 <input placeholder="E-mail" type="email" id="email" name="email" required onChange={handleEmailChange} onBlur={handleEmailBlur} />
                 {emailError && <div className={`email-error${emailError ? ' email-error-active' : ''}`}>{emailError}</div>}
                 <div className="input-password-wrapper">
-                    <input placeholder="Contraseña" type="password" id="password" name="password" required />
-                    <img src={ojo} alt='ojo' className="icono-ojo" tabIndex={0} />
+                    <input placeholder="Contraseña" type={showPassword ? "text" : "password"} id="password" name="password" required />
+                    <img
+                        src={showPassword ? ojo_cerradp : ojo}
+                        alt={showPassword ? 'ojo cerrado' : 'ojo abierto'}
+                        id="icono-ojo-login"
+                        tabIndex={0}
+                        onClick={() => setShowPassword(v => !v)}
+                    />
                 </div>
                 <div className="checkbox-guardar">
                     <input type="checkbox" id="guardar" name="guardar" />

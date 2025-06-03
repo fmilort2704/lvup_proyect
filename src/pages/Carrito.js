@@ -12,7 +12,6 @@ import { ProductosContext } from '../context/ProductosContext';
 export default function Carrito() {
     const [productos, setProductos] = useState([]);
     const [otrosProductos, setOtrosProductos] = useState([]);
-    const { productos: productosContext } = useContext(ProductosContext);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [modal, setModal] = useState({
@@ -28,7 +27,9 @@ export default function Carrito() {
     useEffect(() => {
         const id_usuario = localStorage.getItem('id_usuario');
         if (!id_usuario) {
-            setError("No se ha encontrado el usuario");
+            // Usuario no logueado: cargar carrito anónimo de localStorage
+            const carritoAnonimo = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
+            setProductos(carritoAnonimo);
             setLoading(false);
             return;
         }
@@ -47,10 +48,15 @@ export default function Carrito() {
     }, []);
 
     useEffect(() => {
-        if (productosContext && productosContext.length > 0) {
-            setOtrosProductos(productosContext);
-        }
-    }, [productosContext]);
+        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos')
+            .then(res => res.json())
+            .then(data => {
+                setOtrosProductos(data.productos || []);
+            })
+            .catch(() => {
+                setOtrosProductos([]);
+            });
+    }, []);
 
     const showModal = (title, message, type = 'info', onConfirm = null) => {
         setModal({
@@ -68,12 +74,17 @@ export default function Carrito() {
 
     const recargarCarrito = () => {
         const id_usuario = localStorage.getItem('id_usuario');
-        if (!id_usuario) return;
-
+        if (!id_usuario) {
+            // Usuario no logueado: recargar carrito anónimo
+            const carritoAnonimo = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
+            setProductos(carritoAnonimo);
+            return;
+        }
         fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`)
             .then(res => res.json())
             .then(data => {
-                setProductos(data.carrito || []);
+                const activos = (data.carrito || []).filter(p => p.estado === 'activo');
+                setProductos(activos);
             })
             .catch(() => {
                 showModal("Error", "Error al recargar el carrito", "error");
@@ -86,6 +97,17 @@ export default function Carrito() {
             `¿Estás seguro de que quieres eliminar "${nombre_producto}" del carrito?`,
             "confirm",
             () => {
+                const id_usuario = localStorage.getItem('id_usuario');
+                if (!id_usuario) {
+                    // Usuario no logueado: eliminar del carrito anónimo en localStorage
+                    let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
+                    carrito = carrito.filter(p => p.id_producto !== producto_id);
+                    localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
+                    setProductos(carrito);
+                    showModal("Éxito", "Producto eliminado del carrito correctamente", "success");
+                    closeModal();
+                    return;
+                }
                 fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_producto_carrito/${producto_id}`, {
                     method: 'DELETE'
                 })
@@ -106,27 +128,45 @@ export default function Carrito() {
         );
     };
 
-    const incrementarCantidad = (producto_id, nombre_producto) => {
+    const incrementarCantidad = async (producto_id, nombre_producto) => {
         const id_usuario = localStorage.getItem('id_usuario');
-
-        fetch('http://localhost/Proyectos/LvUp_backend/api/incrementar_carrito', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    showModal("Error", data.error, "error");
-                } else {
-                    recargarCarrito();
-                }
-            })
-            .catch(() => {
-                showModal("Error", "Error al incrementar la cantidad", "error");
+        // Buscar el producto en el carrito para saber la cantidad actual
+        const productoCarrito = productos.find(p => p.producto_id === producto_id || p.id_producto === producto_id);
+        const cantidadActual = productoCarrito ? productoCarrito.cantidad : 0;
+        try {
+            // Consultar el stock real del producto
+            const resStock = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_stock/${producto_id}`);
+            const dataStock = await resStock.json();
+            console.log(dataStock.stock.stock)
+            const stock = dataStock.stock.stock;
+            console.log(stock)
+            if (stock === null) {
+                showModal("Error", "No se pudo obtener el stock actual del producto", "error");
+                return;
+            }
+            console.log(cantidadActual)
+            if (cantidadActual >= stock) {
+                console.log("Sin stock");
+                showModal("Sin stock suficiente", `No puedes añadir más unidades de \"${nombre_producto}\". Stock disponible: ${stock}`, "warning");
+                return;
+            }
+            // Si hay stock suficiente, incrementar
+            const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/incrementar_carrito', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
             });
+            const data = await res.json();
+            if (data.error) {
+                showModal("Error", data.error, "error");
+            } else {
+                recargarCarrito();
+            }
+        } catch (e) {
+            showModal("Error", "Error al comprobar el stock o incrementar la cantidad", "error");
+        }
     };
 
     const decrementarCantidad = (producto_id, nombre_producto, cantidad_actual) => {
@@ -185,11 +225,19 @@ export default function Carrito() {
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
         if (!usuario_id) {
-            showModal(
-                'Sesión requerida',
-                'Debes iniciar sesión para añadir productos al carrito',
-                'warning'
-            );
+            // Usuario no logueado: manejar carrito en localStorage
+            let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
+            // Buscar el producto en la lista de otrosProductos (por si no está en productos)
+            const producto = (productos.find(p => p.id_producto === producto_id) || otrosProductos.find(p => p.id_producto === producto_id));
+            if (!producto) return;
+            const idx = carrito.findIndex(p => p.id_producto === producto_id);
+            if (idx !== -1) {
+                carrito[idx].cantidad += 1;
+            } else {
+                carrito.push({ ...producto, cantidad: 1 });
+            }
+            localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
+            showModal('¡Producto añadido!', 'El producto se ha añadido correctamente al carrito', 'success');
             return;
         }
         try {
@@ -249,7 +297,7 @@ export default function Carrito() {
         <div id="container">
             <h2>Esta es tu cesta de la compra</h2>
             <div id="carrito-contenedor-principal">
-                <div id="carrito" className="carrito-azul">
+                <div className="carrito-azul">
                     {productos.length === 0 ? (
                         <h3>Tu carrito está vacío</h3>
                     ) : (
@@ -260,24 +308,25 @@ export default function Carrito() {
                                         <img src={producto.imagen_url} alt='producto_imagen' />                                        <div className="producto-carrito-header-info">
                                             <h3>{producto.nombre}</h3>
                                             <img
+                                                id='papelera_icon'
                                                 src={papelera}
                                                 alt='papelera'
                                                 onClick={() => eliminarProducto(producto.producto_id, producto.nombre)}
-                                                style={{ cursor: 'pointer' }}
                                             />
+                                            <button id='papeleraBtn' onClick={() => eliminarProducto(producto.producto_id, producto.nombre)}>
+                                                Borrar producto
+                                            </button>
                                             <p>
-                                                <span>{producto.precio}€/und x {producto.cantidad} unds = {(producto.precio * producto.cantidad)}€</span>
+                                                <span>{producto.precio}€/und x {producto.cantidad} unds = {(Math.round((producto.precio * producto.cantidad) * 100) / 100)}€</span>
                                                 <img
                                                     src={menos}
                                                     alt='restar'
                                                     onClick={() => decrementarCantidad(producto.producto_id, producto.nombre, producto.cantidad)}
-                                                    style={{ cursor: 'pointer' }}
                                                 />
                                                 <img
                                                     src={mas}
                                                     alt='sumar'
                                                     onClick={() => incrementarCantidad(producto.producto_id, producto.nombre)}
-                                                    style={{ cursor: 'pointer' }}
                                                 />
                                             </p>
                                         </div>
@@ -297,7 +346,7 @@ export default function Carrito() {
                                             <p>Pay</p>
                                         </button>
                                     </div>
-                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                    <div id='comprarCtn'>
                                         <button id='comprar' onClick={handlePagar}>Comprar</button>
                                     </div>
                                 </div>
@@ -306,40 +355,46 @@ export default function Carrito() {
                 </div>
                 <div id='otrosProductos'>
                     <h2>Otros productos</h2>
-                    {otrosProductos.length > 0 &&
-                        otrosProductos
-                            .sort(() => Math.random() - 0.5)
-                            .slice(0, 4)
-                            .map(producto => (
-                                <div key={producto.id_producto} className="tarjeta-producto">
-                                    <div className="productos">
-                                        <div id='f-line-producto'>
-                                            <img src={producto.imagen_url} alt={producto.nombre} />
-                                            <div className="producto-info">
-                                                <div className="producto-header">
-                                                    <h3>
-                                                        <Link
-                                                            className='link'
-                                                            to={`/producto`}
-                                                            state={{ id_producto: producto.id_producto }}
-                                                        >
-                                                            {producto.nombre}
-                                                        </Link>
-                                                    </h3>
-                                                    <img
-                                                        src={addCarrito}
-                                                        alt='carrito'
-                                                        style={{ cursor: 'pointer' }}
-                                                        onClick={() => handleAddToCart(producto.id_producto)}
-                                                    />
+                    <div className="productos">
+                        {otrosProductos.length > 0 &&
+                            otrosProductos
+                                .sort(() => Math.random() - 0.5)
+                                .slice(0, 4)
+                                .map(producto => (
+                                    <div key={producto.id_producto} className="tarjeta-producto">
+                                        <div className="productos">
+                                            <div id='f-line-producto'>
+                                                <img src={producto.imagen_url} alt={producto.nombre} />
+                                                <div className="producto-info">
+                                                    <div className="producto-header">
+                                                        <h3>
+                                                            <Link
+                                                                className='link'
+                                                                to={`/producto`}
+                                                                state={{ id_producto: producto.id_producto }}
+                                                            >
+                                                                {producto.nombre}
+                                                            </Link>
+                                                        </h3>
+                                                    </div>
+                                                    <p>{producto.descripcion}</p>
+                                                    <p className="precio">Desde {producto.precio}€</p>
                                                 </div>
-                                                <p>{producto.descripcion}</p>
-                                                <p className="precio">Desde {producto.precio}€</p>
+                                                <img
+                                                    id='addCarritoIcon'
+                                                    onClick={() => handleAddToCart(producto.id_producto)}
+                                                    src={addCarrito}
+                                                    alt='carrito'
+
+                                                />
+                                                <button id='addCarritoBtn' onClick={() => handleAddToCart(producto.id_producto)}>
+                                                    Añadir a la cesta
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                    </div>
                 </div>
             </div>
             <Modal

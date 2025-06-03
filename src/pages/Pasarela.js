@@ -82,7 +82,89 @@ export default function Pasarela() {
                 body: JSON.stringify(payload)
             });
             const data = await res.json();
+            console.log(data.success)
             if (data.success) {
+                // --- INSERTAR EN BD: VENTA Y DETALLE ---
+                const id_usuario = localStorage.getItem('id_usuario');
+                // 1. Obtener el último id_venta y calcular el nuevo id_venta
+                let id_venta = null;
+                try {
+                    const resUltimaVenta = await fetch('http://localhost/Proyectos/LvUp_backend/api/ultima_venta');
+                    const dataUltimaVenta = await resUltimaVenta.json();
+                    if (dataUltimaVenta) {
+                        id_venta = parseInt(dataUltimaVenta.id_venta.id_venta, 10) + 1;
+                    } else {
+                        id_venta = 1; // Si no hay ventas aún
+                    }
+                } catch (e) {
+                    id_venta = 1;
+                }
+                // 2. Insertar venta principal con id_venta
+                let ventaResponse = null;
+                if (carrito && carrito.length > 0) {
+                    console.log(id_venta)
+                    try {
+                        const ventaRes = await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id_venta,
+                                total: totalCarrito,
+                                comprador_id: id_usuario,
+                            })
+                        });
+                        ventaResponse = await ventaRes.json();
+                    } catch (e) {
+                        console.log(e)
+                    }
+
+                } else {
+                    console.log(id_venta)
+                    const ventaRes = await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_venta,
+                            total: precio,
+                            comprador_id: id_usuario,
+                        })
+                    });
+                    ventaResponse = await ventaRes.json();
+                }
+                console.log(id_venta)
+                // 3. Insertar detalles de venta con el mismo id_venta
+                if (id_venta) {
+                    if (carrito && carrito.length > 0) {
+                        console.log(id_venta)
+                        for (const p of carrito) {
+                            await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta_detalle', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    id_venta,
+                                    producto_id: p.id_producto,
+                                    cantidad: p.cantidad,
+                                    vendedor_id: p.vendedor_id || null
+                                })
+                            });
+                        }
+                    } else {
+                        console.log(id_venta);
+                        console.log(location.state?.id_producto);
+                        console.log(location.state?.vendedor_id);
+                        await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta_detalle', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id_venta,
+                                producto_id: location.state?.id_producto,
+                                cantidad: 1,
+                                vendedor_id: location.state?.vendedor_id || null
+                            })
+                        });
+                    }
+                }
+                // --- FIN INSERTS ---
                 setModal({
                     isOpen: true,
                     title: 'Pago realizado',
@@ -91,8 +173,6 @@ export default function Pasarela() {
                 });
                 // Marcar carrito como procesado (puedes ajustar el endpoint según tu backend)
                 if (carrito && carrito.length > 0) {
-                    const id_usuario = localStorage.getItem('id_usuario');
-                    console.log(id_usuario)
                     if (id_usuario) {
                         fetch(`http://localhost/Proyectos/LvUp_backend/api/procesar_carrito/${id_usuario}`, {
                             method: 'PUT',
@@ -122,9 +202,9 @@ export default function Pasarela() {
 
     return (
         <div id="container">
-            <form className="form-login" onSubmit={handleSubmit} style={{ maxWidth: 500, margin: '2rem auto' }}>
+            <form className="form-login" onSubmit={handleSubmit}>
                 <h2>Resumen de compra</h2>
-                <div style={{marginBottom: '1rem', fontWeight: 'bold'}}>
+                <div id='resCompra'>
                     {carrito && carrito.length > 0 ? (
                         <>
                             {carrito.map((p, idx) => (
@@ -134,8 +214,8 @@ export default function Pasarela() {
                         </>
                     ) : (
                         <>
-                            Producto: {nombreProducto}<br/>
-                            Precio: {precio} €<br/>
+                            Producto: {nombreProducto}<br />
+                            Precio: {precio} €<br />
                             cantidad: {cantidad}
                         </>
                     )}
@@ -154,7 +234,7 @@ export default function Pasarela() {
                 <input type="text" name="codigoPostal" placeholder="Código Postal" value={form.codigoPostal} onChange={handleChange} required />
                 <input type="text" name="provincia" placeholder="Provincia" value={form.provincia} onChange={handleChange} required />
                 <h2>Método de pago</h2>
-                <select name="metodoPago" value={form.metodoPago} onChange={handleChange} required style={{ height: '2.5rem', marginBottom: '.8rem', color: 'black' }}>
+                <select name="metodoPago" value={form.metodoPago} onChange={handleChange} required>
                     <option value="">Selecciona un método</option>
                     <option value="tarjeta">Tarjeta de crédito</option>
                     <option value="paypal">PayPal</option>
