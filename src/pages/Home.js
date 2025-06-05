@@ -31,26 +31,13 @@ export default function Home() {
 
   const handleAddToCart = async (producto_id) => {
     const usuario_id = localStorage.getItem('id_usuario');
+    console.log(usuario_id);
     if (!usuario_id) {
-      // Usuario no logueado: manejar carrito en localStorage
-      let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
-      // Si el producto ya está en el carrito, incrementar cantidad
-      const idx = carrito.findIndex(p => p.id_producto === producto_id);
-      if (idx !== -1) {
-        carrito[idx].cantidad += 1;
-      } else {
-        // Buscar el producto en la lista de productos
-        const producto = productos.find(p => p.id_producto === producto_id);
-        if (producto) {
-          carrito.push({ ...producto, cantidad: 1 });
-        }
-      }
-      localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
       setModal({
         isOpen: true,
-        title: '¡Producto añadido!',
-        message: 'El producto se ha añadido correctamente al carrito',
-        type: 'success'
+        title: 'Sesión requerida',
+        message: 'Debes iniciar sesión para añadir productos al carrito',
+        type: 'warning'
       });
       return;
     }
@@ -64,7 +51,7 @@ export default function Home() {
       const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json',  'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(body)
       });
@@ -163,7 +150,7 @@ export default function Home() {
                       <Link
                         className='link'
                         to={`/producto`}
-                        state={{ id_producto: producto.id_producto }}
+                        state={{ id_producto: producto.id_producto, fromNavigate: true }}
                       >
                         {producto.nombre}
                       </Link>
@@ -201,7 +188,7 @@ export default function Home() {
                         <Link
                           className='link'
                           to={`/producto`}
-                          state={{ id_producto: producto.id_producto }}
+                          state={{ id_producto: producto.id_producto, fromNavigate: true }}
                         >
                           {producto.nombre}
                         </Link>

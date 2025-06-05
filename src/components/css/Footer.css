@@ -142,4 +142,7 @@ ul{
         align-items: flex-start;
         text-align: left;
     }
+    #twitter, #instagram, #facebook, #youtube, #tiktok {
+        display: inline;
+    }
 }

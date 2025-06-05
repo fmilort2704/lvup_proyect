@@ -63,7 +63,7 @@ export default function CrearCuenta() {
 
     function closeModal() {
         setModal({ ...modal, isOpen: false });
-        navigate('/login');
+        navigate('/login', { state:{ fromNavigate: true }});
     }
 
     function handleEmailChange() {
@@ -95,51 +95,13 @@ export default function CrearCuenta() {
                 <input placeholder="Nombre" type="text" id="nombre" name="nombre" required />
                 <input placeholder="E-mail" type="email" id="email" name="email" required onChange={handleEmailChange} onBlur={handleEmailBlur} />
                 {emailError && <div className={`email-error${emailError ? ' email-error-active' : ''}`}>{emailError}</div>}
-                <div className="input-password-wrapper">
-                    <input
-                        placeholder="Contraseña"
-                        type={showPassword ? "text" : "password"}
-                        id="password"
-                        name="password"
-                        required
-                        onBlur={handlePasswordBlur}
-                    />
-                    <img
-                        src={showPassword ? ojo_cerradp : ojo}
-                        alt={showPassword ? 'ojo cerrado' : 'ojo abierto'}
-                        className="icono-ojo"
-                        tabIndex={0}
-                        onClick={() => setShowPassword(v => !v)}
-                    />
-                </div>
-                <div className="input-password-wrapper">
-                    <input
-                        placeholder="Confirmar contraseña"
-                        type={showConfirmPassword ? "text" : "password"}
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        required
-                        onBlur={handlePasswordBlur}
-                    />
-                    <img
-                        src={showConfirmPassword ? ojo_cerradp : ojo}
-                        alt={showConfirmPassword ? 'ojo cerrado' : 'ojo abierto'}
-                        className="icono-ojo"
-                        tabIndex={0}
-                        onClick={() => setShowConfirmPassword(v => !v)}
-                    />
-                </div>
-                <div className="checkbox-guardar">
-                    <input type="checkbox" id="guardar" name="guardar" />
-                    <label htmlFor="guardar">Recordar contraseña</label>
-                </div>
                 {confirmPasswordError && <div className="email-error email-error-active">{confirmPasswordError}</div>}
                 <div className="botones-login">
                     <button type="submit" disabled={loading}>{loading ? 'Cargando...' : 'Crear Cuenta'}</button>
                 </div>
                 {registerError && <div className="email-error email-error-active">{registerError}</div>}
             </form>
-            <p id='tienesCuenta'>¿Ya tienes una cuenta? <strong onClick={() => navigate('/login')}>Iniciar sesión</strong></p>
+            <p id='tienesCuenta'>¿Ya tienes una cuenta? <strong onClick={() => navigate('/login', { state:{ fromNavigate: true }})}>Iniciar sesión</strong></p>
             <Modal
                 isOpen={modal.isOpen}
                 onClose={closeModal}

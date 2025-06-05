@@ -53,7 +53,7 @@ export default function Header() {
         setSearchOpen(false);
         setSearchValue('');
         setFiltered([]);
-        navigate('/producto', { state: { id_producto: producto.id_producto } });
+        navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } });
     };
     // Cerrar búsqueda
     const handleCloseSearch = () => {
@@ -72,7 +72,7 @@ export default function Header() {
             });
             return;
         }
-        navigate(path);
+        navigate(path, { state: { fromNavigate: true } });
     };
 
     useEffect(() => {
@@ -91,7 +91,7 @@ export default function Header() {
     return (
         <header className="p-4 bg-blue-600">
             <div id='header'>
-                <div id='logo' onClick={() => navigate('/')}>
+                <div id='logo' onClick={() => navigate('/', { state: { fromNavigate: true } })}>
                     <img src={logo} alt="LvUp Logo" className="h-10" />
                     <h1>LvUp</h1>
                 </div>
@@ -113,12 +113,12 @@ export default function Header() {
                                             <div><strong>Gmail: </strong> {gmail}</div>
                                             <div><strong>Puntos: </strong>{puntos}</div>
                                             <div id='botones_perfil'>
-                                                <Link to={"/Editar"} onClick={() => setShowUserMenu(false)}>
+                                                <Link to={"/Editar"} state={{ fromNavigate: true }} onClick={() => setShowUserMenu(false) }>
                                                     <button>
                                                         Editar perfil
                                                     </button>
                                                 </Link>
-                                                <Link to="/Administracion" onClick={() => setShowUserMenu(false)}>
+                                                <Link to="/Administracion" state={{ fromNavigate: true }} onClick={() => setShowUserMenu(false)}>
                                                     <button>
                                                         Panel Admin
                                                     </button>
@@ -141,13 +141,13 @@ export default function Header() {
                                 )}
                             </>
                         ) : (
-                            <Link to={"/login"}>
+                            <Link to={"/login"} state={{ fromNavigate: true }}>
                                 <img src={user} alt='user' />
                                 <span id='s-sesion'>Iniciar sesión</span>
                             </Link>
                         )}
                     </div>
-                    <Link to={'/carrito'}>
+                    <Link to={'/carrito'} state={{ fromNavigate: true }}>
                         <div id='carrito'>
                             <img src={carrito} alt='carrito' />
                             <span id='s-carrito'>Carrito</span>
@@ -174,10 +174,10 @@ export default function Header() {
                         />
                     </div>
                     <ul id='listaMenu' className={menuOpen ? 'menu-open' : ''}>
-                        <li onClick={() => { setMenuOpen(false); navigate('/'); }}>Inicio</li>
-                        <li onClick={() => { setMenuOpen(false); navigate('/Posts'); }}>Publicaciones</li>
-                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevaPublicacion'); }}>Crear Publicación</li>
-                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevoProducto'); }}>Crear Producto</li>
+                        <li onClick={() => { setMenuOpen(false); navigate('/', { state: { fromNavigate: true } }); }}>Inicio</li>
+                        <li onClick={() => { setMenuOpen(false); navigate('/Posts', { state: { fromNavigate: true } }); }}>Publicaciones</li>
+                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevaPublicacion', { state: { fromNavigate: true } }); }}>Crear Publicación</li>
+                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevoProducto', { state: {fromNavigate: true } }); }}>Crear Producto</li>
                         <li>
                             Categorias
                             <img
@@ -188,10 +188,10 @@ export default function Header() {
                                 className={submenuOpen ? 'flecha-rotada' : ''}
                             />
                             <ul id='submenu' className={submenuOpen ? 'submenu-open' : ''}>
-                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Videojuegos' } }); }}>Videojuegos</li>
-                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Consolas' } }); }}>Consolas</li>
-                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Accesorios' } }); }}>Accesorios</li>
-                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Merchandising' } }); }}>Merchandising</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Videojuegos', fromNavigate: true } }); }}>Videojuegos</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Consolas', fromNavigate: true } }); }}>Consolas</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Accesorios', fromNavigate: true } }); }}>Accesorios</li>
+                                <li onClick={() => { setMenuOpen(false); navigate('/', { state: { categoria: 'Merchandising', fromNavigate: true } }); }}>Merchandising</li>
                             </ul>
                         </li>
                     </ul>

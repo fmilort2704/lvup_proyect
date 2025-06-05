@@ -81,7 +81,7 @@ export default function EditarPublicacion() {
             const res = await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_post/${publicacion.id_post}`,
                 {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                     body: JSON.stringify(body)
                 }
             );
@@ -92,7 +92,7 @@ export default function EditarPublicacion() {
                 setModalOpen(true);
                 setTimeout(() => {
                     setModalOpen(false);
-                    navigate('/Administracion');
+                    navigate('/Administracion', { state:{ fromNavigate: true }});
                 }, 1500);
             } else {
                 setModalMsg('Error al actualizar la publicación.');
@@ -122,7 +122,7 @@ export default function EditarPublicacion() {
                     {publicacion?.img_publicacion && (
                         <div>
                             <span>Imagen actual:</span><br/>
-                            <img src={publicacion.img_publicacion} alt="imagen_publicacion" />
+                            <img src={publicacion.img_publicacion} alt="imagen_publicacion" height="97" width="79"/>
                         </div>
                     )}
                 </label>

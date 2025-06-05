@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/estilos.css';
 import Modal from '../components/Modal';
+import { useNavigate } from 'react-router-dom';
 
 export default function Publicacion() {
     const location = useLocation();
@@ -17,6 +18,7 @@ export default function Publicacion() {
     const [enviando, setEnviando] = useState(false);
     const [otrasPublicaciones, setOtrasPublicaciones] = useState([]);
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+    const navigate = useNavigate();
 
     // Obtener datos de la publicación
     useEffect(() => {
@@ -87,7 +89,7 @@ export default function Publicacion() {
         try {
             const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_comentario', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 body: new URLSearchParams({
                     contenido: nuevoComentario,
                     post_id: id_post,
@@ -136,7 +138,9 @@ export default function Publicacion() {
                                                 type: 'warning'
                                             });
                                         } else {
-                                            window.location.href = '/Valoraciones?id_usuario=' + post.autor_id;
+                                            navigate('/Valoraciones', {
+                                                state: { id_usuario: post.autor_id, fromNavigate: true }
+                                            });
                                         }
                                     }}
                                 >
@@ -166,7 +170,7 @@ export default function Publicacion() {
                                 Comentar
                             </button>
                             {localStorage.getItem('id_usuario') && localStorage.getItem('id_usuario') !== String(post.autor_id) && (
-                                <Link to="/Valoraciones" state={{ post: post }}>
+                                <Link to="/Valoraciones" state={{ post: post, fromNavigate: true }}>
                                     <button className="btn-valoracion">Deja valoración</button>
                                 </Link>
                             )}
@@ -202,7 +206,11 @@ export default function Publicacion() {
                             otrasPublicaciones.map((p, idx) => (
                                 <div className='tarjeta_publicaciones' key={p.id_post || idx} style={{ margin: '1rem 0' }}>
                                     <img src={p.img_publicacion} alt='imagen_publicacion' />
-                                    <h3>{p.titulo}</h3>
+                                    <h3
+                                        onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })}
+                                    >
+                                        {p.titulo}
+                                    </h3>
                                     <img src={icon_login} alt='icono_usuario' />
                                     <span>{p.nombre}</span>
                                     <span>{p.descripcion}</span>

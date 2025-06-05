@@ -426,6 +426,13 @@ img[alt='carrito'] {
     margin-top: 1rem;
 }
 
+#usuario h3,
+#usuario a {
+    margin-top: 10;
+    margin-bottom: 0;
+    font-size: 1rem;
+}
+
 #empresa h3,
 #fecha h3 {
     margin: 0;
@@ -523,8 +530,7 @@ button.btnPago img {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: .8em;
-    padding-bottom: 2.3rem;
+    gap: .8em;  
     border-radius: 1rem;
 }
 
@@ -1216,6 +1222,17 @@ a {
 #imgProducto{
     height: 150px;
     width: 120px;
+}
+
+#btnPuntos{
+    margin-top: .5rem;
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: black;
+    color: white;
+    width: 30%;
+    height: 3rem;
+    border-radius: .5rem;
 }
 /* --- Home Responsive: en escritorio (≥900px) imagen arriba, info debajo, tarjetas flexibles --- */
 @media (min-width: 600px) {

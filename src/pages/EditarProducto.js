@@ -92,7 +92,7 @@ export default function EditarProducto() {
             const res = await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_producto/${producto.id_producto}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify(body)
             });
@@ -102,7 +102,7 @@ export default function EditarProducto() {
                 setModalOpen(true);
                 setTimeout(() => {
                     setModalOpen(false);
-                    navigate('/Administracion');
+                    navigate('/Administracion', { state:{ fromNavigate: true }});
                 }, 1500);
             } else {
                 setModalMsg('Error al actualizar el producto.');
@@ -135,7 +135,7 @@ export default function EditarProducto() {
                     {producto?.imagen_url && (
                         <div>
                             <span>Imagen actual:</span><br/>
-                            <img src={producto.imagen_url} alt="imagen_producto" />
+                            <img src={producto.imagen_url} alt="imagen_producto" height="97" width="79" />
                         </div>
                     )}
                 </label>

@@ -22,7 +22,7 @@ export default function Posts() {
                         <div className='tarjeta_publicaciones' key={post.id_post || post.id}>
                             <img src={post.img_publicacion} alt='imagen_publicacion' />
                             <h3
-                                onClick={() => navigate('/Publicacion', { state: { post } })}
+                                onClick={() => navigate('/Publicacion', { state: { post, fromNavigate: true } })}
                             >
                                 {post.titulo}
                             </h3>

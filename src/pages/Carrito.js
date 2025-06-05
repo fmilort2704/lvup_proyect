@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState } from 'react';
 import papelera from '../assets/Iconos/mdi--rubbish-bin-empty.svg';
 import mas from '../assets/Iconos/ic--baseline-plus.svg';
 import menos from '../assets/Iconos/ic--baseline-minus.svg';
@@ -7,7 +7,6 @@ import google from '../assets/Iconos/devicon--google.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
-import { ProductosContext } from '../context/ProductosContext';
 
 export default function Carrito() {
     const [productos, setProductos] = useState([]);
@@ -27,13 +26,13 @@ export default function Carrito() {
     useEffect(() => {
         const id_usuario = localStorage.getItem('id_usuario');
         if (!id_usuario) {
-            // Usuario no logueado: cargar carrito anónimo de localStorage
-            const carritoAnonimo = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
-            setProductos(carritoAnonimo);
+            setError("No se ha encontrado el usuario");
             setLoading(false);
             return;
         }
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`)
+        const token = localStorage.getItem('token');
+        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`,
+            { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(data => {
                 // Filtrar solo productos con estado 'activo'
@@ -74,13 +73,10 @@ export default function Carrito() {
 
     const recargarCarrito = () => {
         const id_usuario = localStorage.getItem('id_usuario');
-        if (!id_usuario) {
-            // Usuario no logueado: recargar carrito anónimo
-            const carritoAnonimo = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
-            setProductos(carritoAnonimo);
-            return;
-        }
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`)
+        if (!id_usuario) return;
+        const token = localStorage.getItem('token');
+        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`,
+            { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(data => {
                 const activos = (data.carrito || []).filter(p => p.estado === 'activo');
@@ -97,20 +93,9 @@ export default function Carrito() {
             `¿Estás seguro de que quieres eliminar "${nombre_producto}" del carrito?`,
             "confirm",
             () => {
-                const id_usuario = localStorage.getItem('id_usuario');
-                if (!id_usuario) {
-                    // Usuario no logueado: eliminar del carrito anónimo en localStorage
-                    let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
-                    carrito = carrito.filter(p => p.id_producto !== producto_id);
-                    localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
-                    setProductos(carrito);
-                    showModal("Éxito", "Producto eliminado del carrito correctamente", "success");
-                    closeModal();
-                    return;
-                }
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_producto_carrito/${producto_id}`, {
-                    method: 'DELETE'
-                })
+                const token = localStorage.getItem('token');
+                fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_producto_carrito/${producto_id}`,
+                    { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } })
                     .then(res => res.json())
                     .then(data => {
                         if (data.error) {
@@ -130,12 +115,14 @@ export default function Carrito() {
 
     const incrementarCantidad = async (producto_id, nombre_producto) => {
         const id_usuario = localStorage.getItem('id_usuario');
+        const token = localStorage.getItem('token');
         // Buscar el producto en el carrito para saber la cantidad actual
         const productoCarrito = productos.find(p => p.producto_id === producto_id || p.id_producto === producto_id);
         const cantidadActual = productoCarrito ? productoCarrito.cantidad : 0;
         try {
             // Consultar el stock real del producto
-            const resStock = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_stock/${producto_id}`);
+            const resStock = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_stock/${producto_id}`,
+                { headers: { 'Authorization': 'Bearer ' + token } });
             const dataStock = await resStock.json();
             console.log(dataStock.stock.stock)
             const stock = dataStock.stock.stock;
@@ -155,6 +142,7 @@ export default function Carrito() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + token
                 },
                 body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
             });
@@ -171,7 +159,7 @@ export default function Carrito() {
 
     const decrementarCantidad = (producto_id, nombre_producto, cantidad_actual) => {
         const id_usuario = localStorage.getItem('id_usuario');
-
+        const token = localStorage.getItem('token');
         if (cantidad_actual === 1) {
             showModal(
                 "Confirmar eliminación",
@@ -182,6 +170,7 @@ export default function Carrito() {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
+                            'Authorization': 'Bearer ' + token
                         },
                         body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
                     })
@@ -205,6 +194,7 @@ export default function Carrito() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + token
                 },
                 body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
             })
@@ -225,26 +215,20 @@ export default function Carrito() {
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
         if (!usuario_id) {
-            // Usuario no logueado: manejar carrito en localStorage
-            let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
-            // Buscar el producto en la lista de otrosProductos (por si no está en productos)
-            const producto = (productos.find(p => p.id_producto === producto_id) || otrosProductos.find(p => p.id_producto === producto_id));
-            if (!producto) return;
-            const idx = carrito.findIndex(p => p.id_producto === producto_id);
-            if (idx !== -1) {
-                carrito[idx].cantidad += 1;
-            } else {
-                carrito.push({ ...producto, cantidad: 1 });
-            }
-            localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
-            showModal('¡Producto añadido!', 'El producto se ha añadido correctamente al carrito', 'success');
+            showModal(
+                'Sesión requerida',
+                'Debes iniciar sesión para añadir productos al carrito',
+                'warning'
+            );
             return;
         }
+        const token = localStorage.getItem('token');
         try {
             const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'Authorization': 'Bearer ' + token
                 },
                 body: `usuario_id=${usuario_id}&producto_id=${producto_id}`
             });
@@ -285,7 +269,8 @@ export default function Carrito() {
         navigate('/pasarela', {
             state: {
                 productos: productosPasarela,
-                total: total.toFixed(2)
+                total: total.toFixed(2),
+                fromNavigate: true 
             }
         });
     };
@@ -371,7 +356,7 @@ export default function Carrito() {
                                                             <Link
                                                                 className='link'
                                                                 to={`/producto`}
-                                                                state={{ id_producto: producto.id_producto }}
+                                                                state={{ id_producto: producto.id_producto,  fromNavigate: true  }}
                                                             >
                                                                 {producto.nombre}
                                                             </Link>

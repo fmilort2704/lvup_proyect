@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 
@@ -25,7 +25,36 @@ export default function Pasarela() {
         numeroTarjeta: ''
     });
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
+    const [usarPuntos, setUsarPuntos] = useState(false);
+    const [puntosUsuario, setPuntosUsuario] = useState(0);
+    const [descuento, setDescuento] = useState(0);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Obtener puntos del usuario si está logueado
+        const id_usuario = localStorage.getItem('id_usuario');
+        const token = localStorage.getItem('token');
+        if (id_usuario && token) {
+            fetch(`http://localhost/Proyectos/LvUp_backend/api/ver_puntos_usuario/${id_usuario}`, {
+                headers: { 'Authorization': 'Bearer ' + token }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.puntos.puntos)
+                    setPuntosUsuario(data.puntos.puntos || 0);
+                });
+        }
+    }, []);
+
+    const totalSinDescuento = carrito && carrito.length > 0 ? Number(totalCarrito) : Number(precio) * Number(cantidad || 1);
+    const totalConDescuento = (totalSinDescuento - descuento).toFixed(2);
+
+    function handleUsarPuntos() {
+        // Cada punto rebaja 0.01€
+        const maxDescuento = Math.min(puntosUsuario * 0.01, totalSinDescuento);
+        setDescuento(maxDescuento);
+        setUsarPuntos(true);
+    }
 
     function handleChange(e) {
         const { name, value } = e.target;
@@ -71,7 +100,7 @@ export default function Pasarela() {
             const payload = {
                 ...form,
                 productos: carrito,
-                total: totalCarrito,
+                total: totalConDescuento,
                 nombreProducto,
                 precio,
                 cantidad
@@ -89,7 +118,10 @@ export default function Pasarela() {
                 // 1. Obtener el último id_venta y calcular el nuevo id_venta
                 let id_venta = null;
                 try {
-                    const resUltimaVenta = await fetch('http://localhost/Proyectos/LvUp_backend/api/ultima_venta');
+                    const token = localStorage.getItem('token');
+                    const resUltimaVenta = await fetch('http://localhost/Proyectos/LvUp_backend/api/ultima_venta', {
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
                     const dataUltimaVenta = await resUltimaVenta.json();
                     if (dataUltimaVenta) {
                         id_venta = parseInt(dataUltimaVenta.id_venta.id_venta, 10) + 1;
@@ -101,15 +133,15 @@ export default function Pasarela() {
                 }
                 // 2. Insertar venta principal con id_venta
                 let ventaResponse = null;
+                const token = localStorage.getItem('token');
                 if (carrito && carrito.length > 0) {
-                    console.log(id_venta)
                     try {
                         const ventaRes = await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                             body: JSON.stringify({
                                 id_venta,
-                                total: totalCarrito,
+                                total: totalConDescuento, // aplicar descuento
                                 comprador_id: id_usuario,
                             })
                         });
@@ -119,27 +151,24 @@ export default function Pasarela() {
                     }
 
                 } else {
-                    console.log(id_venta)
                     const ventaRes = await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta', {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                         body: JSON.stringify({
                             id_venta,
-                            total: precio,
+                            total: totalConDescuento, // aplicar descuento también en compra individual
                             comprador_id: id_usuario,
                         })
                     });
                     ventaResponse = await ventaRes.json();
                 }
-                console.log(id_venta)
                 // 3. Insertar detalles de venta con el mismo id_venta
                 if (id_venta) {
                     if (carrito && carrito.length > 0) {
-                        console.log(id_venta)
                         for (const p of carrito) {
                             await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta_detalle', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                                 body: JSON.stringify({
                                     id_venta,
                                     producto_id: p.id_producto,
@@ -149,12 +178,9 @@ export default function Pasarela() {
                             });
                         }
                     } else {
-                        console.log(id_venta);
-                        console.log(location.state?.id_producto);
-                        console.log(location.state?.vendedor_id);
                         await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta_detalle', {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                             body: JSON.stringify({
                                 id_venta,
                                 producto_id: location.state?.id_producto,
@@ -165,6 +191,39 @@ export default function Pasarela() {
                     }
                 }
                 // --- FIN INSERTS ---
+                // --- ACTUALIZAR PUNTOS USUARIO ---
+                if (id_usuario) {
+                    const puntosCompra = Math.round(Number(totalConDescuento)); // cada céntimo = 1 punto
+                    console.log(puntosCompra)
+                    try {
+                        // Si se han usado puntos, primero igualar a 0
+                        console.log(usarPuntos)
+                        if (usarPuntos && puntosUsuario > 0) {
+                            console.log("Puntos: " + puntosCompra)
+                            await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_puntos_usuario/${id_usuario}`, {
+                                method: 'PUT',
+                                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ puntos: puntosCompra })
+                            });
+                            setPuntosUsuario(puntosCompra);
+                        } else {
+                            const puntosTotales = puntosUsuario + puntosCompra;
+                            console.log("Puntos: " + puntosTotales)
+                            // Sumar los puntos generados por la compra
+                            await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_puntos_usuario/${id_usuario}`, {
+                                method: 'PUT',
+                                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ puntos: puntosTotales })
+                            });
+                            setPuntosUsuario(puntosTotales)
+                        }
+                        // Actualizar puntos en frontend
+
+                    } catch (e) {
+                        console.log('Error actualizando puntos:', e);
+                    }
+                }
+                // --- FIN ACTUALIZAR PUNTOS USUARIO ---
                 setModal({
                     isOpen: true,
                     title: 'Pago realizado',
@@ -176,11 +235,12 @@ export default function Pasarela() {
                     if (id_usuario) {
                         fetch(`http://localhost/Proyectos/LvUp_backend/api/procesar_carrito/${id_usuario}`, {
                             method: 'PUT',
+                            headers: { 'Authorization': 'Bearer ' + token }
                         });
                     }
                 }
                 setTimeout(() => {
-                    navigate('/');
+                    navigate('/', { state: { fromNavigate: true } });
                 }, 2000);
             } else {
                 setModal({
@@ -210,14 +270,32 @@ export default function Pasarela() {
                             {carrito.map((p, idx) => (
                                 <div key={idx}>{p.nombre} x{p.cantidad} = {p.subtotal.toFixed(2)}€</div>
                             ))}
-                            <div>Total: {totalCarrito}€</div>
+                            <div>Total: {totalSinDescuento.toFixed(2)}€</div>
                         </>
                     ) : (
                         <>
                             Producto: {nombreProducto}<br />
                             Precio: {precio} €<br />
                             cantidad: {cantidad}
+                            <div>Total: {totalSinDescuento.toFixed(2)}€</div>
                         </>
+                    )}
+                    {/* Botón y resumen de puntos, disponible en ambos casos */}
+                    {!usarPuntos && puntosUsuario > 0 && (
+                        <button
+                            type="button"
+                            id='btnPuntos'
+                            onClick={handleUsarPuntos}
+                        >
+                            Usar puntos ({puntosUsuario} disponibles)
+                        </button>
+                    )}
+                    {usarPuntos && (
+                        <div style={{ color: 'green', marginBottom: '10px' }}>
+                            Descuento aplicado: -{descuento.toFixed(2)}€ ({Math.floor(descuento * 100)} puntos)
+                            <br />
+                            Nuevo total: {totalConDescuento}€
+                        </div>
                     )}
                 </div>
                 <h2>Datos personales</h2>

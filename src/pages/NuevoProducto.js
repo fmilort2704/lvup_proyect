@@ -89,7 +89,7 @@ export default function NuevoProducto() {
                 const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',  'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify(body)
                 });
@@ -108,7 +108,7 @@ export default function NuevoProducto() {
                     setModalOpen(true);
                     setTimeout(() => {
                         setTimeout(() => {
-                            navigate('/');
+                            navigate('/', {state:{ fromNavigate: true }});
                         }, 1500);
                     }, 1500);
                 } else {

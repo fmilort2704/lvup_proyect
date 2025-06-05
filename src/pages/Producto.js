@@ -18,23 +18,11 @@ export default function Producto() {
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
         if (!usuario_id) {
-            // Usuario no logueado: manejar carrito en localStorage
-            let carrito = JSON.parse(localStorage.getItem('carrito_anonimo') || '[]');
-            // Buscar el producto en la lista de productos
-            const producto = productos.find(p => p.id_producto === producto_id);
-            if (!producto) return;
-            const idx = carrito.findIndex(p => p.id_producto === producto_id);
-            if (idx !== -1) {
-                carrito[idx].cantidad += 1;
-            } else {
-                carrito.push({ ...producto, cantidad: 1 });
-            }
-            localStorage.setItem('carrito_anonimo', JSON.stringify(carrito));
             setModal({
                 isOpen: true,
-                title: '¡Producto añadido!',
-                message: 'El producto se ha añadido correctamente al carrito',
-                type: 'success'
+                title: 'Sesión requerida',
+                message: 'Debes iniciar sesión para añadir productos al carrito',
+                type: 'warning'
             });
             return;
         }
@@ -43,7 +31,7 @@ export default function Producto() {
             const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: `usuario_id=${usuario_id}&producto_id=${producto_id}`
             });
@@ -77,7 +65,7 @@ export default function Producto() {
 
     const handlePagar = () => {
 
-        navigate('/pasarela', { state: { id_producto: id_producto, precio: producto.precio, cantidad: 1, nombre: producto.nombre, vendedor_id: producto.vendedor_id } });
+        navigate('/pasarela', { state: { id_producto: id_producto, precio: producto.precio, cantidad: 1, nombre: producto.nombre, vendedor_id: producto.vendedor_id, fromNavigate: true } });
     };
 
     const closeModal = () => {
@@ -112,7 +100,7 @@ export default function Producto() {
         <div id='container'>
             <div id='detallesProducto'>
                 <div id='detallesProducto-fl'>
-                    <img src={producto.imagen_url} alt='img_producto' id='imgProducto'/>
+                    <img src={producto.imagen_url} alt='img_producto' id='imgProducto' />
                     <div className="info-texto">
                         <div id='prodTit'>
                             <h2>{producto.nombre}</h2>
@@ -123,11 +111,9 @@ export default function Producto() {
                                 <>
                                     <div id='usuario'>
                                         <h3>Usuario:</h3>
-                                        <p>
-                                            <Link className='link' to='/Valoraciones' state={{ id_usuario: producto.vendedor_id }}>
+                                            <Link className='link' to='/Valoraciones' state={{ id_usuario: producto.vendedor_id, fromNavigate: true }}>
                                                 {producto.nombre_usuario || producto.usuario || 'Usuario desconocido'}
                                             </Link>
-                                        </p>
                                     </div>
                                     <div id='fecha'>
                                         <h3>Fecha de publicación:</h3>
@@ -147,7 +133,7 @@ export default function Producto() {
                                 </>
                             )}
                         </div>
-                        {pegiSrc && (
+                        {pegiSrc && producto.estado !== 'segunda_mano' && (
                             <div id='pegi'>
                                 <h3>Pegi:</h3>
                                 <img src={pegiSrc} alt='pegi' />
@@ -205,7 +191,7 @@ export default function Producto() {
                                                         <Link
                                                             className='link'
                                                             to={`/producto`}
-                                                            state={{ id_producto: producto.id_producto }}
+                                                            state={{ id_producto: producto.id_producto, fromNavigate: true }}
                                                         >
                                                             {producto.nombre}
                                                         </Link>

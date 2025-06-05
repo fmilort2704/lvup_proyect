@@ -26,7 +26,9 @@ export default function Valoraciones() {
     useEffect(() => {
         if (!id_usuario) return;
         setLoading(true);
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_valoraciones_usuario/${id_usuario}`)
+        const token = localStorage.getItem('token');
+        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_valoraciones_usuario/${id_usuario}`,
+            { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(data => {
                 setValoraciones(data.valoraciones || []);
@@ -63,14 +65,15 @@ export default function Valoraciones() {
                 console.log(nuevaMedia);
                 console.log(numVal);
                 try {
+                    const token = localStorage.getItem('token');
                     await fetch(`http://localhost/Proyectos/LvUp_backend/api/editar_valoracion_publicacion/${post.id_post}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                         body: JSON.stringify({ puntuacion: nuevaMedia, numVal: numVal + 1 })
                     });
                     setModal({ isOpen: true, message: '¡Valoración enviada!', type: 'success' });
                     setTimeout(() => {
-                        navigate('/posts');
+                        navigate('/posts', { state: { fromNavigate: true } });
                     }, 2000);
                 } catch (e) {
                     console.log(e)
@@ -82,9 +85,10 @@ export default function Valoraciones() {
                     return;
                 }
                 // Valoración normal de usuario
+                const token = localStorage.getItem('token');
                 res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_valoracion', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({
                         valorado_id: id_usuario,
                         valorador_id: id_usuario_logueado,
@@ -99,7 +103,7 @@ export default function Valoraciones() {
                     setPuntuacion(5);
                     // Recargar valoraciones
                     setTimeout(() => {
-                        navigate('/posts');
+                        navigate('/posts', { state: { fromNavigate: true } });
                     }, 2000);
                 } else {
                     setModal({ isOpen: true, message: data.error || 'Error al enviar valoración', type: 'error' });

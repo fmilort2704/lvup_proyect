@@ -42,10 +42,11 @@ export default function InciarSesion({ onLogin }) {
                     localStorage.setItem('verificado', data.usuario.verificado);
                     console.log(data.usuario.rol);
                     localStorage.setItem('rol', data.usuario.rol);
+                    localStorage.setItem('token', data.token);
                     if (onLogin) onLogin();
-                    navigate('/');
+                    navigate('/', { state:{ fromNavigate: true }});
                 } else {
-                    setLoginError(data.message || 'Usuario o contraseña incorrectos');
+                    setLoginError(data.error || 'Usuario o contraseña incorrectos');
                 }
             })
             .catch(() => {
@@ -69,7 +70,7 @@ export default function InciarSesion({ onLogin }) {
     }
 
     function handleCrearCuenta() {
-        navigate('/CrearCuenta');
+        navigate('/CrearCuenta', { state:{ fromNavigate: true }});
     }
 
     return (
@@ -87,10 +88,6 @@ export default function InciarSesion({ onLogin }) {
                         tabIndex={0}
                         onClick={() => setShowPassword(v => !v)}
                     />
-                </div>
-                <div className="checkbox-guardar">
-                    <input type="checkbox" id="guardar" name="guardar" />
-                    <label htmlFor="guardar">Recordar contraseña</label>
                 </div>
                 <div className="botones-login">
                     <button type="submit" disabled={loading}>{loading ? 'Cargando...' : 'Iniciar Sesión'}</button>

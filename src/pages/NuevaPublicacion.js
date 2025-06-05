@@ -74,7 +74,7 @@ export default function NuevaPublicacion() {
                 const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_post', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')
                     },
                     body: JSON.stringify(body)
                 });
@@ -99,7 +99,7 @@ export default function NuevaPublicacion() {
         setModalOpen(false);
         if (publicacionCreada) {
             setPublicacionCreada(false);
-            navigate('/');
+            navigate('/', { state:{ fromNavigate: true }});
         }
     };
 

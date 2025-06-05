@@ -40,7 +40,9 @@ export default function EditarPerfil() {
         // Obtener datos actuales del usuario al cargar el componente
         const id_usuario = localStorage.getItem('id_usuario');
         if (id_usuario) {
-            fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_usuario/${id_usuario}`)
+            const token = localStorage.getItem('token');
+            fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_usuario/${id_usuario}`,
+                { headers: { 'Authorization': 'Bearer ' + token } })
                 .then(res => res.json())
                 .then(data => {
                     if (data.usuario) {
@@ -114,7 +116,7 @@ export default function EditarPerfil() {
 
         fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_usuario/${id_usuario}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
         })
             .then(res => res.json())
@@ -128,7 +130,7 @@ export default function EditarPerfil() {
                     localStorage.setItem('nombre', body.nombre);
                     localStorage.setItem('email', body.email);
                     setTimeout(() => {
-                        navigate('/');
+                        navigate('/', { state:{ fromNavigate: true }});
                     }, 1500);
                 } else {
                     setError(data.mensaje || "Error al actualizar el usuario");

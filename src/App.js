@@ -20,6 +20,7 @@ import EditarProducto from './pages/EditarProducto';
 import EditarPublicacion from './pages/EditarPublicacion';
 import Admin from './pages/Admin';
 import Valoraciones from './pages/Valoraciones';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   // Estado para forzar recarga del header
@@ -36,21 +37,30 @@ function App() {
             <Header key={headerKey} />
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path='/producto' element={<Producto />} />
-              <Route path='/login' element={<Login onLogin={handleHeaderReload} />} />
-              <Route path='/Editar' element={<Editar />} />
-              <Route path='/Carrito' element={<Carrito />} />
-              <Route path='/CrearCuenta' element={<CrearCuenta />} />
-              <Route path='/Pasarela' element={<Pasarela />} />
-              <Route path='/Publicacion' element={<Publicacion />} />
-              <Route path='/Posts' element={<Posts />} />
-              <Route path='/NuevoProducto' element={<NuevoProducto/>}/>
-              <Route path='/NuevaPublicacion' element={<NuevaPublicacion/>}/>
-              <Route path='/EditarProducto' element={<EditarProducto/>}/>
-              <Route path='/EditarPublicacion' element={<EditarPublicacion/>}/>
-              <Route path='/Administracion' element={<Admin/>}/>
-              <Route path='/Valoraciones' element={<Valoraciones/>}/>
-            </Routes >
+              <Route
+                path="*"
+                element={
+                  <ProtectedRoute>
+                    <Routes>
+                      <Route path='/producto' element={<Producto />} />
+                      <Route path='/login' element={<Login onLogin={handleHeaderReload} />} />
+                      <Route path='/Editar' element={<Editar />} />
+                      <Route path='/Carrito' element={<Carrito />} />
+                      <Route path='/CrearCuenta' element={<CrearCuenta />} />
+                      <Route path='/Pasarela' element={<Pasarela />} />
+                      <Route path='/Publicacion' element={<Publicacion />} />
+                      <Route path='/Posts' element={<Posts />} />
+                      <Route path='/NuevoProducto' element={<NuevoProducto />} />
+                      <Route path='/NuevaPublicacion' element={<NuevaPublicacion />} />
+                      <Route path='/EditarProducto' element={<EditarProducto />} />
+                      <Route path='/EditarPublicacion' element={<EditarPublicacion />} />
+                      <Route path='/Administracion' element={<Admin />} />
+                      <Route path='/Valoraciones' element={<Valoraciones />} />
+                    </Routes>
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
             <Footer />
           </Router>
         </PublicacionesProvider>
