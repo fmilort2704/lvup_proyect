@@ -54,16 +54,11 @@ export default function Valoraciones() {
             let res, data;
             console.log(post);
             if (post) {
+                // Valoración de publicación: tras valorar, navegar a posts
                 // Obtener puntuacion y numVal actuales de la publicación
                 const puntuacionActual = parseFloat(post.puntuacion) || 0;
                 const numVal = parseInt(post.numVal) || 0;
-                console.log(puntuacionActual);
-                console.log(numVal);
-                // Calcular nueva media
                 const nuevaMedia = Math.round((puntuacionActual * numVal + puntuacion) / (numVal + 1));
-                // Actualizar publicación con la nueva media y numVal + 1
-                console.log(nuevaMedia);
-                console.log(numVal);
                 try {
                     const token = localStorage.getItem('token');
                     await fetch(`http://localhost/Proyectos/LvUp_backend/api/editar_valoracion_publicacion/${post.id_post}`, {
@@ -80,6 +75,7 @@ export default function Valoraciones() {
                 }
                 setPuntuacion(5);
             } else {
+                // Valoración de usuario: solo mostrar modal, NO navegar
                 if (!nuevaValoracion.trim()) {
                     setModal({ isOpen: true, message: 'La valoración no puede estar vacía', type: 'warning' });
                     return;
@@ -102,9 +98,15 @@ export default function Valoraciones() {
                     setNuevaValoracion('');
                     setPuntuacion(5);
                     // Recargar valoraciones
-                    setTimeout(() => {
-                        navigate('/posts', { state: { fromNavigate: true } });
-                    }, 2000);
+                    setLoading(true);
+                    fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_valoraciones_usuario/${id_usuario}`,
+                        { headers: { 'Authorization': 'Bearer ' + token } })
+                        .then(res => res.json())
+                        .then(data => {
+                            setValoraciones(data.valoraciones || []);
+                            setLoading(false);
+                        })
+                        .catch(() => setLoading(false));
                 } else {
                     setModal({ isOpen: true, message: data.error || 'Error al enviar valoración', type: 'error' });
                 }

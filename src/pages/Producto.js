@@ -184,7 +184,12 @@ export default function Producto() {
                                 <div key={producto.id_producto} className="tarjeta-producto">
                                     <div className="productos">
                                         <div id='f-line-producto'>
-                                            <img src={producto.imagen_url} alt={producto.nombre} />
+                                            <img
+                                                src={producto.imagen_url}
+                                                alt={producto.nombre}
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
+                                            />
                                             <div className="producto-info">
                                                 <div className="producto-header">
                                                     <h3>

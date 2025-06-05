@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
 import "./css/estilos.css";
 import { useProductos } from '../context/ProductosContext';
@@ -20,6 +20,7 @@ export default function Home() {
     'Accesorios': 3,
     'Merchandising': 4
   };
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (location.state && location.state.categoria) {
@@ -143,7 +144,11 @@ export default function Home() {
           <div key={producto.id} className="tarjeta-producto">
             <div className="producto">
               <div id='f-line-producto'>
-                <img src={producto.imagen_url} alt={producto.nombre} />
+                <img src={producto.imagen_url}
+                alt={producto.nombre}
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })} 
+                />
                 <div className="producto-info">
                   <div className="producto-header">
                     <h3>

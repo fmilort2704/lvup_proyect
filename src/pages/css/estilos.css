@@ -1234,6 +1234,10 @@ a {
     height: 3rem;
     border-radius: .5rem;
 }
+
+#btnPagar{
+    cursor: pointer;
+}
 /* --- Home Responsive: en escritorio (≥900px) imagen arriba, info debajo, tarjetas flexibles --- */
 @media (min-width: 600px) {
     .productos {

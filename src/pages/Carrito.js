@@ -24,6 +24,7 @@ export default function Carrito() {
 
     console.log(localStorage.getItem('id_usuario'));
     useEffect(() => {
+        console.log(localStorage.getItem('id_usuario'))
         const id_usuario = localStorage.getItem('id_usuario');
         if (!id_usuario) {
             setError("No se ha encontrado el usuario");
@@ -31,6 +32,7 @@ export default function Carrito() {
             return;
         }
         const token = localStorage.getItem('token');
+        console.log(token)
         fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`,
             { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
@@ -40,7 +42,8 @@ export default function Carrito() {
                 setProductos(activos);
                 setLoading(false);
             })
-            .catch(() => {
+            .catch((e) => {
+                console.log(e)
                 setError("Error al cargar el carrito");
                 setLoading(false);
             });
@@ -349,7 +352,11 @@ export default function Carrito() {
                                     <div key={producto.id_producto} className="tarjeta-producto">
                                         <div className="productos">
                                             <div id='f-line-producto'>
-                                                <img src={producto.imagen_url} alt={producto.nombre} />
+                                                <img src={producto.imagen_url}
+                                                alt={producto.nombre}
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
+                                                />
                                                 <div className="producto-info">
                                                     <div className="producto-header">
                                                         <h3>

@@ -205,7 +205,7 @@ export default function Publicacion() {
                         {otrasPublicaciones && otrasPublicaciones.length > 0 ? (
                             otrasPublicaciones.map((p, idx) => (
                                 <div className='tarjeta_publicaciones' key={p.id_post || idx} style={{ margin: '1rem 0' }}>
-                                    <img src={p.img_publicacion} alt='imagen_publicacion' />
+                                    <img src={p.img_publicacion} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })}/>
                                     <h3
                                         onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })}
                                     >

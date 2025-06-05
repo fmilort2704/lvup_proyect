@@ -19,6 +19,7 @@ export default function Header() {
     const [searchOpen, setSearchOpen] = useState(false);
     const [searchValue, setSearchValue] = useState('');
     const [filtered, setFiltered] = useState([]);
+    const [filteredProductos, setFilteredProductos] = useState([]);
     const [modal, setModal] = useState({ isOpen: false });
     const searchInputRef = useRef(null);
     const navigate = useNavigate();
@@ -38,12 +39,25 @@ export default function Header() {
         setSearchOpen(true);
         setTimeout(() => searchInputRef.current && searchInputRef.current.focus(), 200);
     };
+    // Obtener todos los productos para la búsqueda (lupa)
+    useEffect(() => {
+        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos')
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data.productos)) {
+                    setFilteredProductos(data.productos);
+                } else {
+                    setFilteredProductos([]);
+                }
+            })
+            .catch(() => setFilteredProductos([]));
+    }, []);
     // Filtrado en vivo
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchValue(value);
         if (value.trim().length > 0) {
-            setFiltered(productos.filter(p => p.nombre.toLowerCase().includes(value.toLowerCase())));
+            setFiltered(filteredProductos.filter(p => p.nombre.toLowerCase().includes(value.toLowerCase())));
         } else {
             setFiltered([]);
         }
@@ -178,13 +192,12 @@ export default function Header() {
                         <li onClick={() => { setMenuOpen(false); navigate('/Posts', { state: { fromNavigate: true } }); }}>Publicaciones</li>
                         <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevaPublicacion', { state: { fromNavigate: true } }); }}>Crear Publicación</li>
                         <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevoProducto', { state: {fromNavigate: true } }); }}>Crear Producto</li>
-                        <li>
+                        <li onClick={toggleSubmenu}>
                             Categorias
                             <img
                                 id='flecha_icon'
                                 src={flecha}
                                 alt='flecha'
-                                onClick={toggleSubmenu}
                                 className={submenuOpen ? 'flecha-rotada' : ''}
                             />
                             <ul id='submenu' className={submenuOpen ? 'submenu-open' : ''}>

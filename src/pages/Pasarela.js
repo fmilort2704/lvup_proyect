@@ -321,7 +321,7 @@ export default function Pasarela() {
                 {form.metodoPago === 'tarjeta' && (
                     <input type="text" name="numeroTarjeta" placeholder="Número de la tarjeta" value={form.numeroTarjeta} onChange={handleChange} required />
                 )}
-                <button type="submit" disabled={false}>{'Pagar'}</button>
+                <button id='btnPagar' type="submit" disabled={false}>{'Pagar'}</button>
             </form>
             <Modal
                 isOpen={modal.isOpen}
