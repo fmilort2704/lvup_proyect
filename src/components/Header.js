@@ -127,7 +127,7 @@ export default function Header() {
                                             <div><strong>Gmail: </strong> {gmail}</div>
                                             <div><strong>Puntos: </strong>{puntos}</div>
                                             <div id='botones_perfil'>
-                                                <Link to={"/Editar"} state={{ fromNavigate: true }} onClick={() => setShowUserMenu(false) }>
+                                                <Link to={"/Editar"} state={{ fromNavigate: true }} onClick={() => setShowUserMenu(false)}>
                                                     <button>
                                                         Editar perfil
                                                     </button>
@@ -161,12 +161,16 @@ export default function Header() {
                             </Link>
                         )}
                     </div>
-                    <Link to={'/carrito'} state={{ fromNavigate: true }}>
-                        <div id='carrito'>
-                            <img src={carrito} alt='carrito' />
-                            <span id='s-carrito'>Carrito</span>
-                        </div>
-                    </Link>
+                    <div
+                        id='carrito'
+                        onClick={() => {
+                            handleProtectedNavigate('/carrito', { state: { fromNavigate: true } });
+                        }}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <img src={carrito} alt='carrito' />
+                        <span id='s-carrito'>Carrito</span>
+                    </div>
                 </div>
             </div>
             <div id='searchBar'>
@@ -191,7 +195,7 @@ export default function Header() {
                         <li onClick={() => { setMenuOpen(false); navigate('/', { state: { fromNavigate: true } }); }}>Inicio</li>
                         <li onClick={() => { setMenuOpen(false); navigate('/Posts', { state: { fromNavigate: true } }); }}>Publicaciones</li>
                         <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevaPublicacion', { state: { fromNavigate: true } }); }}>Crear Publicación</li>
-                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevoProducto', { state: {fromNavigate: true } }); }}>Crear Producto</li>
+                        <li onClick={() => { setMenuOpen(false); handleProtectedNavigate('/NuevoProducto', { state: { fromNavigate: true } }); }}>Crear Producto</li>
                         <li onClick={toggleSubmenu}>
                             Categorias
                             <img

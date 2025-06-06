@@ -10,7 +10,7 @@ export default function Admin() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
     const [loading, setLoading] = useState(true);
-    const [adminView, setAdminView] = useState(null); // null: no elegido, 'admin', 'user'
+    const [adminView, setAdminView] = useState(null);
     const [modalConfirm, setModalConfirm] = useState({ open: false, msg: '', onConfirm: null });
     const navigate = useNavigate();
 
@@ -18,7 +18,7 @@ export default function Admin() {
     useEffect(() => {
         const rol = localStorage.getItem('rol');
         if (rol === 'admin') {
-            setAdminView(null); // Esperar selección
+            setAdminView(null); 
         } else if (rol) {
             setAdminView('user');
             fetchUserData();
@@ -174,7 +174,7 @@ export default function Admin() {
         });
     };
 
-    // Mostrar pantalla de selección aunque loading sea true si adminView === null
+    // Mostrar pantalla de selección aunque loading sea true si adminView es null
     if (localStorage.getItem('rol') === 'admin' && adminView === null) {
         return (
             <div className="admin-panel">
@@ -227,7 +227,6 @@ export default function Admin() {
                     </button>
                 </div>
             )}
-            {/* Productos */}
             {Array.isArray(productos) && productos.length > 0 && (
                 <div className="admin-section">
                     <h3>Productos</h3>
@@ -246,7 +245,6 @@ export default function Admin() {
                     </ul>
                 </div>
             )}
-            {/* Publicaciones */}
             {Array.isArray(posts) && posts.length > 0 && (
                 <div className="admin-section">
                     <h3>Publicaciones</h3>
@@ -265,7 +263,6 @@ export default function Admin() {
                     </ul>
                 </div>
             )}
-            {/* Comentarios */}
             {Array.isArray(comentarios) && comentarios.length > 0 && (
                 <div className="admin-section">
                     <h3>Comentarios</h3>

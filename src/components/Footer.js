@@ -17,7 +17,9 @@ export default function Footer() {
 
     const handleOpen = (type) => {
         setModal(type);
-        if (type === 'cookies') setShowCookies(true);
+        if (type === 'cookies') {
+            setShowCookies(true);
+        }
     };
     const handleClose = () => setModal(null);
 
@@ -35,7 +37,9 @@ export default function Footer() {
         } else {
             document.body.style.overflow = '';
         }
-        return () => { document.body.style.overflow = ''; };
+        return () => { 
+            document.body.style.overflow = '';
+        };
     }, [modal])
 
     useEffect(() => {

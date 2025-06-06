@@ -235,9 +235,7 @@ h1{
 }
 
 #inputSearch{
-     width: '80%';
      padding: 0.7rem 1rem;
-     border-radius: 8;
      border: 1.5px solid #18b6ff;
      font-size: 1.1rem;
      margin-bottom: 1rem;
@@ -308,8 +306,7 @@ h1{
     }
 
     .header-right {
-        display: flex;
-        gap: 1.2rem;         /* Más espacio entre login y carrito */
+        gap: 1.2rem;         
     }
     #s-sesion, #s-carrito, #s-search {
         color: black;
