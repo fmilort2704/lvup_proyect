@@ -3,6 +3,21 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import user_icon from '../assets/Iconos/icono_login.svg';
 
+// Utilidad para obtener la URL base del backend según entorno
+const getBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return process.env.REACT_APP_URL_BACK_NODE;
+    }
+    return 'http://localhost:4000';
+};
+
+const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
 function getIdUsuario(location) {
     // Prioridad: state, luego query string
     if (location.state?.id_usuario) return location.state.id_usuario;
@@ -27,7 +42,7 @@ export default function Valoraciones() {
         if (!id_usuario) return;
         setLoading(true);
         const token = localStorage.getItem('token');
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_valoraciones_usuario/${id_usuario}`,
+        fetch(`${getPhpBackendUrl()}/obtener_valoraciones_usuario/${id_usuario}`,
             { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(data => {
@@ -61,7 +76,7 @@ export default function Valoraciones() {
                 const nuevaMedia = Math.round((puntuacionActual * numVal + puntuacion) / (numVal + 1));
                 try {
                     const token = localStorage.getItem('token');
-                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/editar_valoracion_publicacion/${post.id_post}`, {
+                    await fetch(`${getPhpBackendUrl()}/editar_valoracion_publicacion/${post.id_post}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                         body: JSON.stringify({ puntuacion: nuevaMedia, numVal: numVal + 1 })
@@ -82,7 +97,7 @@ export default function Valoraciones() {
                 }
                 // Valoración normal de usuario
                 const token = localStorage.getItem('token');
-                res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_valoracion', {
+                res = await fetch(`${getPhpBackendUrl()}/crear_valoracion`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                     body: JSON.stringify({
@@ -99,7 +114,7 @@ export default function Valoraciones() {
                     setPuntuacion(5);
                     // Recargar valoraciones
                     setLoading(true);
-                    fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_valoraciones_usuario/${id_usuario}`,
+                    fetch(`${getPhpBackendUrl()}/obtener_valoraciones_usuario/${id_usuario}`,
                         { headers: { 'Authorization': 'Bearer ' + token } })
                         .then(res => res.json())
                         .then(data => {
@@ -121,7 +136,7 @@ export default function Valoraciones() {
             {post ? (
                 <div className="tarjeta_publicaciones valoracion-publicacion-preview" style={{ marginBottom: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
                     <h3>{post.titulo}</h3>
-                    <img src={post.img_publicacion} alt="imagen_publicacion" style={{ width: '90%', maxWidth: '200px', height: '110px', objectFit: 'contain', borderRadius: '8px', background: '#fff', margin: '0.5rem auto 1rem auto', display: 'block' }} />
+                    <img src={`${getBackendUrl()}${post.img_publicacion}`} alt="imagen_publicacion" style={{ width: '90%', maxWidth: '200px', height: '110px', objectFit: 'contain', borderRadius: '8px', background: '#fff', margin: '0.5rem auto 1rem auto', display: 'block' }} />
                     <img src={user_icon} alt='icono_usuario' />
                     <span>{post.nombre}</span>
                     <span>{post.descripcion}</span>

@@ -14,6 +14,20 @@ export default function Home() {
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
+  const getBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+      return process.env.REACT_APP_URL_BACK_NODE;
+    }
+    return 'http://localhost:4000';
+  };
+
+  const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
   const categoriaToId = {
     'Consolas': 1,
     'Videojuegos': 2,
@@ -49,10 +63,10 @@ export default function Home() {
     };
 
     try {
-      const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
+      const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',  'Authorization': 'Bearer ' + localStorage.getItem('token')
+          'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(body)
       });
@@ -95,7 +109,7 @@ export default function Home() {
       try {
         let data;
         if (categoriaSeleccionada && categoriaToId[categoriaSeleccionada]) {
-          const response = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_categoria/${categoriaToId[categoriaSeleccionada]}`);
+          const response = await fetch(`${getPhpBackendUrl()}/obtener_productos_categoria/${categoriaToId[categoriaSeleccionada]}`);
           if (!response.ok) throw new Error('Error al cargar los productos de la categoría');
           data = await response.json();
           // Filtrar productos con stock > 0
@@ -104,7 +118,7 @@ export default function Home() {
           setNuevosProductos([]);
           setProductosSegundaMano([]);
         } else {
-          const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos');
+          const response = await fetch(`${getPhpBackendUrl()}/obtener_productos`);
           if (!response.ok) throw new Error('Error al cargar los productos');
           data = await response.json();
           // Filtrar productos con stock > 0
@@ -144,10 +158,10 @@ export default function Home() {
           <div key={producto.id} className="tarjeta-producto">
             <div className="producto">
               <div id='f-line-producto'>
-                <img src={producto.imagen_url}
-                alt={producto.nombre}
-                style={{ cursor: 'pointer' }}
-                onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })} 
+                <img src={`${getBackendUrl()}${producto.imagen_url}`}
+                  alt={producto.nombre}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
                 />
                 <div className="producto-info">
                   <div className="producto-header">
@@ -186,7 +200,7 @@ export default function Home() {
             <div key={producto.id} className="tarjeta-producto">
               <div className="productos">
                 <div id='f-line-producto'>
-                  <img src={producto.imagen_url} alt={producto.nombre} />
+                  <img src={`${getBackendUrl()}${producto.imagen_url}`} alt={producto.nombre} />
                   <div className="producto-info">
                     <div className="producto-header">
                       <h3>

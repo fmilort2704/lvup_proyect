@@ -22,6 +22,21 @@ export default function Carrito() {
     });
     const navigate = useNavigate();
 
+    const getBackendUrl = () => {
+        if (process.env.NODE_ENV === 'production') {
+            return process.env.REACT_APP_URL_BACK_NODE;
+        }
+        return 'http://localhost:4000';
+    };
+
+    // Utilidad para obtener la URL base del backend PHP según entorno
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     console.log(localStorage.getItem('id_usuario'));
     useEffect(() => {
         console.log(localStorage.getItem('id_usuario'))
@@ -33,7 +48,7 @@ export default function Carrito() {
         }
         const token = localStorage.getItem('token');
         console.log(token)
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`,
+        fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`,
             { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(data => {
@@ -50,7 +65,7 @@ export default function Carrito() {
     }, []);
 
     useEffect(() => {
-        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos')
+        fetch(`${getPhpBackendUrl()}/obtener_productos`)
             .then(res => res.json())
             .then(data => {
                 setOtrosProductos(data.productos || []);
@@ -78,7 +93,7 @@ export default function Carrito() {
         const id_usuario = localStorage.getItem('id_usuario');
         if (!id_usuario) return;
         const token = localStorage.getItem('token');
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_carrito/${id_usuario}`,
+        fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`,
             { headers: { 'Authorization': 'Bearer ' + token } })
             .then(res => res.json())
             .then(data => {
@@ -97,7 +112,7 @@ export default function Carrito() {
             "confirm",
             () => {
                 const token = localStorage.getItem('token');
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_producto_carrito/${producto_id}`,
+                fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito/${producto_id}`,
                     { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } })
                     .then(res => res.json())
                     .then(data => {
@@ -124,7 +139,7 @@ export default function Carrito() {
         const cantidadActual = productoCarrito ? productoCarrito.cantidad : 0;
         try {
             // Consultar el stock real del producto
-            const resStock = await fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_stock/${producto_id}`,
+            const resStock = await fetch(`${getPhpBackendUrl()}/obtener_stock/${producto_id}`,
                 { headers: { 'Authorization': 'Bearer ' + token } });
             const dataStock = await resStock.json();
             console.log(dataStock.stock.stock)
@@ -141,7 +156,7 @@ export default function Carrito() {
                 return;
             }
             // Si hay stock suficiente, incrementar
-            const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/incrementar_carrito', {
+            const res = await fetch(`${getPhpBackendUrl()}/incrementar_carrito`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -169,7 +184,7 @@ export default function Carrito() {
                 `El producto "${nombre_producto}" tiene cantidad 1. ¿Quieres eliminarlo del carrito?`,
                 "confirm",
                 () => {
-                    fetch('http://localhost/Proyectos/LvUp_backend/api/decrementar_carrito', {
+                    fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded',
@@ -193,7 +208,7 @@ export default function Carrito() {
                 }
             );
         } else {
-            fetch('http://localhost/Proyectos/LvUp_backend/api/decrementar_carrito', {
+            fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -227,7 +242,7 @@ export default function Carrito() {
         }
         const token = localStorage.getItem('token');
         try {
-            const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
+            const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -273,7 +288,7 @@ export default function Carrito() {
             state: {
                 productos: productosPasarela,
                 total: total.toFixed(2),
-                fromNavigate: true 
+                fromNavigate: true
             }
         });
     };
@@ -293,7 +308,7 @@ export default function Carrito() {
                             {productos.map((producto, idx) => (
                                 <div key={producto.id_producto || idx} className="producto-carrito">
                                     <div className="producto-carrito-header">
-                                        <img src={producto.imagen_url} alt='producto_imagen' />                                        <div className="producto-carrito-header-info">
+                                        <img src={`${getBackendUrl()}${producto.imagen_url}`} alt='producto_imagen' />                                        <div className="producto-carrito-header-info">
                                             <h3>{producto.nombre}</h3>
                                             <img
                                                 id='papelera_icon'
@@ -352,10 +367,10 @@ export default function Carrito() {
                                     <div key={producto.id_producto} className="tarjeta-producto">
                                         <div className="productos">
                                             <div id='f-line-producto'>
-                                                <img src={producto.imagen_url}
-                                                alt={producto.nombre}
-                                                style={{ cursor: 'pointer' }}
-                                                onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
+                                                <img src={`${getBackendUrl()}${producto.imagen_url}`}
+                                                    alt={producto.nombre}
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
                                                 />
                                                 <div className="producto-info">
                                                     <div className="producto-header">
@@ -363,7 +378,7 @@ export default function Carrito() {
                                                             <Link
                                                                 className='link'
                                                                 to={`/producto`}
-                                                                state={{ id_producto: producto.id_producto,  fromNavigate: true  }}
+                                                                state={{ id_producto: producto.id_producto, fromNavigate: true }}
                                                             >
                                                                 {producto.nombre}
                                                             </Link>

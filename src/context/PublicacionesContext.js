@@ -3,12 +3,18 @@ import { createContext, useContext, useEffect, useState } from 'react';
 const PublicacionesContext = createContext();
 
 export function PublicacionesProvider({ children }) {
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
     const [posts, setPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_posts')
+        fetch(`${getPhpBackendUrl()}/obtener_posts`)
             .then(res => {
                 if (!res.ok) throw new Error('Error al obtener posts');
                 return res.json();

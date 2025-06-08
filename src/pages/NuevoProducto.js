@@ -18,6 +18,20 @@ export default function NuevoProducto() {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const getBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return process.env.REACT_APP_URL_BACK_NODE;
+    }
+    return 'http://localhost:4000';
+};
+
+const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     // Detectar si viene del panel admin para crear producto nuevo
     const isAdminNuevo = location.state?.fromAdministracion === true;
     console.log(isAdminNuevo);
@@ -52,7 +66,7 @@ export default function NuevoProducto() {
         formData.append('imagen', imagen);
         let imagenSubida = false;
         try {
-            const resImg = await fetch('http://localhost:4000/img_lvup/upload', {
+            const resImg = await fetch(`${getBackendUrl()}/img_lvup/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -84,8 +98,8 @@ export default function NuevoProducto() {
             };
             try {
                 const endpoint = isAdminNuevo
-                    ? 'http://localhost/Proyectos/LvUp_backend/api/crear_producto'
-                    : 'http://localhost/Proyectos/LvUp_backend/api/crear_producto_segunda_mano';
+                    ? `${getPhpBackendUrl()}/crear_producto`
+                    : `${getPhpBackendUrl()}/crear_producto_segunda_mano`;
                 const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: {

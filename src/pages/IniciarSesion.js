@@ -11,6 +11,13 @@ export default function InciarSesion({ onLogin }) {
     const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     function handleSubmit(e) {
         e.preventDefault();
         const email = e.target.email.value;
@@ -24,7 +31,7 @@ export default function InciarSesion({ onLogin }) {
         }
         setLoading(true);
         setLoginError("");
-        fetch('http://localhost/Proyectos/LvUp_backend/api/login', {
+        fetch(`${getPhpBackendUrl()}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: email, contrasenya: password })

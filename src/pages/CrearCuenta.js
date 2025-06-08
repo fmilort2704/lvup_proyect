@@ -4,6 +4,14 @@ import ojo from '../assets/Iconos/basil--eye-outline.svg';
 import ojo_cerradp from '../assets/Iconos/mdi--eye-closed.svg';
 import Modal from '../components/Modal';
 
+// Utilidad para obtener la URL base del backend PHP según entorno
+const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
 export default function CrearCuenta() {
     const [emailError, setEmailError] = useState("");
     const [registerError, setRegisterError] = useState("");
@@ -36,10 +44,10 @@ export default function CrearCuenta() {
         if (!valid) return;
         setLoading(true);
         setRegisterError("");
-        fetch('http://localhost/Proyectos/LvUp_backend/api/registrarse', {
+        fetch(`${getPhpBackendUrl()}/registrarse`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre: e.target.nombre.value, email: e.target.email.value   , contrasenya: password})
+            body: JSON.stringify({ nombre: e.target.nombre.value, email: e.target.email.value, contrasenya: password })
         })
             .then(res => res.json())
             .then(data => {
@@ -63,7 +71,7 @@ export default function CrearCuenta() {
 
     function closeModal() {
         setModal({ ...modal, isOpen: false });
-        navigate('/login', { state:{ fromNavigate: true }});
+        navigate('/login', { state: { fromNavigate: true } });
     }
 
     function handleEmailChange() {
@@ -96,12 +104,46 @@ export default function CrearCuenta() {
                 <input placeholder="E-mail" type="email" id="email" name="email" required onChange={handleEmailChange} onBlur={handleEmailBlur} />
                 {emailError && <div className={`email-error${emailError ? ' email-error-active' : ''}`}>{emailError}</div>}
                 {confirmPasswordError && <div className="email-error email-error-active">{confirmPasswordError}</div>}
+                <div className="input-password-wrapper">
+                    <input
+                        placeholder="Contraseña"
+                        type={showPassword ? "text" : "password"}
+                        id="password"
+                        name="password"
+                        required
+                        onBlur={handlePasswordBlur}
+                    />
+                    <img
+                        src={showPassword ? ojo_cerradp : ojo}
+                        alt={showPassword ? 'ojo cerrado' : 'ojo abierto'}
+                        className="icono-ojo"
+                        tabIndex={0}
+                        onClick={() => setShowPassword(v => !v)}
+                    />
+                </div>
+                <div className="input-password-wrapper">
+                    <input
+                        placeholder="Confirmar contraseña"
+                        type={showConfirmPassword ? "text" : "password"}
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        required
+                        onBlur={handlePasswordBlur}
+                    />
+                    <img
+                        src={showConfirmPassword ? ojo_cerradp : ojo}
+                        alt={showConfirmPassword ? 'ojo cerrado' : 'ojo abierto'}
+                        className="icono-ojo"
+                        tabIndex={0}
+                        onClick={() => setShowConfirmPassword(v => !v)}
+                    />
+                </div>
                 <div className="botones-login">
                     <button type="submit" disabled={loading}>{loading ? 'Cargando...' : 'Crear Cuenta'}</button>
                 </div>
                 {registerError && <div className="email-error email-error-active">{registerError}</div>}
             </form>
-            <p id='tienesCuenta'>¿Ya tienes una cuenta? <strong onClick={() => navigate('/login', { state:{ fromNavigate: true }})}>Iniciar sesión</strong></p>
+            <p id='tienesCuenta'>¿Ya tienes una cuenta? <strong onClick={() => navigate('/login', { state: { fromNavigate: true } })}>Iniciar sesión</strong></p>
             <Modal
                 isOpen={modal.isOpen}
                 onClose={closeModal}

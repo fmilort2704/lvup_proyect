@@ -12,6 +12,20 @@ export default function NuevaPublicacion() {
     const [publicacionCreada, setPublicacionCreada] = useState(false);
     const navigate = useNavigate();
 
+    const getBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return process.env.REACT_APP_URL_BACK_NODE;
+    }
+    return 'http://localhost:4000';
+};
+
+const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     const handleImagenChange = (e) => {
         if (e.target.files && e.target.files[0]) {
             setImagen(e.target.files[0]);
@@ -32,7 +46,7 @@ export default function NuevaPublicacion() {
         formData.append('imagen', imagen);
         let imagen_url = '';
         try {
-            const resImg = await fetch('http://localhost:4000/img_lvup/upload', {
+            const resImg = await fetch(`${getBackendUrl()}/img_lvup/upload`, {
                 method: 'POST',
                 body: formData
             });
@@ -71,7 +85,7 @@ export default function NuevaPublicacion() {
                 autor_id: usuario_id
             };
             try {
-                const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_post', {
+                const res = await fetch(`${getPhpBackendUrl()}/crear_post`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')

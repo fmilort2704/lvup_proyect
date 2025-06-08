@@ -30,12 +30,26 @@ export default function Pasarela() {
     const [descuento, setDescuento] = useState(0);
     const navigate = useNavigate();
 
+    const getBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return process.env.REACT_APP_URL_BACK_NODE;
+    }
+    return 'http://localhost:4000';
+};
+
+const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     useEffect(() => {
         // Obtener puntos del usuario si está logueado
         const id_usuario = localStorage.getItem('id_usuario');
         const token = localStorage.getItem('token');
         if (id_usuario && token) {
-            fetch(`http://localhost/Proyectos/LvUp_backend/api/ver_puntos_usuario/${id_usuario}`, {
+            fetch(`${getPhpBackendUrl()}/ver_puntos_usuario/${id_usuario}`, {
                 headers: { 'Authorization': 'Bearer ' + token }
             })
                 .then(res => res.json())
@@ -105,7 +119,7 @@ export default function Pasarela() {
                 precio,
                 cantidad
             };
-            const res = await fetch('http://localhost:4000/enviar_recibo', {
+            const res = await fetch(`${getBackendUrl()}/enviar_recibo`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -119,7 +133,7 @@ export default function Pasarela() {
                 let id_venta = null;
                 try {
                     const token = localStorage.getItem('token');
-                    const resUltimaVenta = await fetch('http://localhost/Proyectos/LvUp_backend/api/ultima_venta', {
+                    const resUltimaVenta = await fetch(`${getPhpBackendUrl()}/ultima_venta`, {
                         headers: { 'Authorization': 'Bearer ' + token }
                     });
                     const dataUltimaVenta = await resUltimaVenta.json();
@@ -136,7 +150,7 @@ export default function Pasarela() {
                 const token = localStorage.getItem('token');
                 if (carrito && carrito.length > 0) {
                     try {
-                        const ventaRes = await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta', {
+                        const ventaRes = await fetch(`${getPhpBackendUrl()}/producir_venta`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                             body: JSON.stringify({
@@ -151,7 +165,7 @@ export default function Pasarela() {
                     }
 
                 } else {
-                    const ventaRes = await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta', {
+                    const ventaRes = await fetch(`${getPhpBackendUrl()}/producir_venta`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                         body: JSON.stringify({
@@ -166,7 +180,7 @@ export default function Pasarela() {
                 if (id_venta) {
                     if (carrito && carrito.length > 0) {
                         for (const p of carrito) {
-                            await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta_detalle', {
+                            await fetch(`${getPhpBackendUrl()}/producir_venta_detalle`, {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                                 body: JSON.stringify({
@@ -178,7 +192,7 @@ export default function Pasarela() {
                             });
                         }
                     } else {
-                        await fetch('http://localhost/Proyectos/LvUp_backend/api/producir_venta_detalle', {
+                        await fetch(`${getPhpBackendUrl()}/producir_venta_detalle`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                             body: JSON.stringify({
@@ -200,7 +214,7 @@ export default function Pasarela() {
                         console.log(usarPuntos)
                         if (usarPuntos && puntosUsuario > 0) {
                             console.log("Puntos: " + puntosCompra)
-                            await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_puntos_usuario/${id_usuario}`, {
+                            await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario/${id_usuario}`, {
                                 method: 'PUT',
                                 headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ puntos: puntosCompra })
@@ -210,7 +224,7 @@ export default function Pasarela() {
                             const puntosTotales = puntosUsuario + puntosCompra;
                             console.log("Puntos: " + puntosTotales)
                             // Sumar los puntos generados por la compra
-                            await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_puntos_usuario/${id_usuario}`, {
+                            await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario/${id_usuario}`, {
                                 method: 'PUT',
                                 headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ puntos: puntosTotales })
@@ -233,7 +247,7 @@ export default function Pasarela() {
                 // Marcar carrito como procesado (puedes ajustar el endpoint según tu backend)
                 if (carrito && carrito.length > 0) {
                     if (id_usuario) {
-                        fetch(`http://localhost/Proyectos/LvUp_backend/api/procesar_carrito/${id_usuario}`, {
+                        fetch(`${getPhpBackendUrl()}/procesar_carrito/${id_usuario}`, {
                             method: 'PUT',
                             headers: { 'Authorization': 'Bearer ' + token }
                         });

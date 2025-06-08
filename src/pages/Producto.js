@@ -14,6 +14,18 @@ export default function Producto() {
     const { productos } = useProductos();
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
     const navigate = useNavigate();
+    const getBackendUrl = () => {
+        if (process.env.NODE_ENV === 'production') {
+            return process.env.REACT_APP_URL_BACK_NODE;
+        }
+        return 'http://localhost:4000';
+    };
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
 
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
@@ -28,7 +40,7 @@ export default function Producto() {
         }
 
         try {
-            const response = await fetch('http://localhost/Proyectos/LvUp_backend/api/introducir_carrito', {
+            const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -87,11 +99,11 @@ export default function Producto() {
 
     let pegiSrc = '';
     switch (producto.pegi) {
-        case '3': pegiSrc = '/img_lvup/pegi3.webp'; break;
-        case '7': pegiSrc = '/img_lvup/pegi7.webp'; break;
-        case '12': pegiSrc = '/img_lvup/pegi12.webp'; break;
-        case '16': pegiSrc = '/img_lvup/pegi16.webp'; break;
-        case '18': pegiSrc = '/img_lvup/pegi18.webp'; break;
+        case '3': pegiSrc = `${getBackendUrl()}/img_lvup/pegi3.webp`; break;
+        case '7': pegiSrc = `${getBackendUrl()}/img_lvup/pegi7.webp`; break;
+        case '12': pegiSrc = `${getBackendUrl()}/img_lvup/pegi12.webp`; break;
+        case '16': pegiSrc = `${getBackendUrl()}/img_lvup/pegi16.webp`; break;
+        case '18': pegiSrc = `${getBackendUrl()}/img_lvup/pegi18.webp`; break;
         default: pegiSrc = '';
     }
     console.log(pegiSrc);
@@ -100,7 +112,7 @@ export default function Producto() {
         <div id='container'>
             <div id='detallesProducto'>
                 <div id='detallesProducto-fl'>
-                    <img src={producto.imagen_url} alt='img_producto' id='imgProducto' />
+                    <img src={`${getBackendUrl()}${producto.imagen_url}`} alt='img_producto' id='imgProducto' />
                     <div className="info-texto">
                         <div id='prodTit'>
                             <h2>{producto.nombre}</h2>
@@ -111,9 +123,9 @@ export default function Producto() {
                                 <>
                                     <div id='usuario'>
                                         <h3>Usuario:</h3>
-                                            <Link className='link' to='/Valoraciones' state={{ id_usuario: producto.vendedor_id, fromNavigate: true }}>
-                                                {producto.nombre_usuario || producto.usuario || 'Usuario desconocido'}
-                                            </Link>
+                                        <Link className='link' to='/Valoraciones' state={{ id_usuario: producto.vendedor_id, fromNavigate: true }}>
+                                            {producto.nombre_usuario || producto.usuario || 'Usuario desconocido'}
+                                        </Link>
                                     </div>
                                     <div id='fecha'>
                                         <h3>Fecha de publicación:</h3>
@@ -185,7 +197,7 @@ export default function Producto() {
                                     <div className="productos">
                                         <div id='f-line-producto'>
                                             <img
-                                                src={producto.imagen_url}
+                                                src={`${getBackendUrl()}${producto.imagen_url}`}
                                                 alt={producto.nombre}
                                                 style={{ cursor: 'pointer' }}
                                                 onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}

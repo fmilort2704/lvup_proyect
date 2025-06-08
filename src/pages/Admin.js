@@ -14,6 +14,14 @@ export default function Admin() {
     const [modalConfirm, setModalConfirm] = useState({ open: false, msg: '', onConfirm: null });
     const navigate = useNavigate();
 
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
+
     // Solo permitir acceso si es admin
     useEffect(() => {
         const rol = localStorage.getItem('rol');
@@ -45,14 +53,15 @@ export default function Admin() {
         }
         try {
             const token = localStorage.getItem('token');
+            console.log(token);
             const [productosRes, postsRes, comentariosRes] = await Promise.all([
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_productos_usuarios/${id_usuario}`, {
+                fetch(`${getPhpBackendUrl()}/obtener_productos_usuarios/${id_usuario}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en productos: ' + t); } }),
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_post_por_usuario/${id_usuario}`, {
+                fetch(`${getPhpBackendUrl()}/obtener_post_por_usuario/${id_usuario}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en posts: ' + t); } }),
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentarios_usuario/${id_usuario}`, {
+                fetch(`${getPhpBackendUrl()}/obtener_comentarios_usuario/${id_usuario}`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en comentarios: ' + t); } }),
             ]);
@@ -71,14 +80,14 @@ export default function Admin() {
         try {
             const token = localStorage.getItem('token');
             const [usuariosRes, productosRes, postsRes, comentariosRes] = await Promise.all([
-                fetch('http://localhost/Proyectos/LvUp_backend/api/usuarios', {
+                fetch(`${getPhpBackendUrl()}/usuarios`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).then(r => r.json()),
-                fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos', {
+                fetch(`${getPhpBackendUrl()}/obtener_productos`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).then(r => r.json()),
-                fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_posts').then(r => r.json()), // pública
-                fetch('http://localhost/Proyectos/LvUp_backend/api/comentarios', {
+                fetch(`${getPhpBackendUrl()}/obtener_posts`).then(r => r.json()), // pública
+                fetch(`${getPhpBackendUrl()}/comentarios`, {
                     headers: { 'Authorization': 'Bearer ' + token }
                 }).then(r => r.json()),
             ]);
@@ -104,7 +113,7 @@ export default function Admin() {
             onConfirm: async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_usuario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     setModalMsg('Usuario bloqueado.');
                     setModalOpen(true);
                     fetchData();
@@ -123,7 +132,7 @@ export default function Admin() {
             onConfirm: async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/borrar_producto/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/borrar_producto/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     setModalMsg('Producto eliminado.');
                     setModalOpen(true);
                     fetchData();
@@ -142,7 +151,7 @@ export default function Admin() {
             onConfirm: async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_post/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_post/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     setModalMsg('Publicación eliminada.');
                     setModalOpen(true);
                     fetchData();
@@ -161,7 +170,7 @@ export default function Admin() {
             onConfirm: async () => {
                 try {
                     const token = localStorage.getItem('token');
-                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_comentario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_comentario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
                     setModalMsg('Comentario eliminado.');
                     setModalOpen(true);
                     fetchData();
@@ -210,7 +219,7 @@ export default function Admin() {
                             onConfirm: async () => {
                                 try {
                                     const id_usuario = localStorage.getItem('id_usuario');
-                                    await fetch(`http://localhost/Proyectos/LvUp_backend/api/eliminar_usuario/${id_usuario}`, { method: 'DELETE' });
+                                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id_usuario}`, { method: 'DELETE' });
                                     localStorage.clear();
                                     setModalMsg('Cuenta eliminada. ¡Hasta pronto!');
                                     setModalOpen(true);

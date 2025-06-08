@@ -19,11 +19,24 @@ export default function Publicacion() {
     const [otrasPublicaciones, setOtrasPublicaciones] = useState([]);
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
     const navigate = useNavigate();
+    const getBackendUrl = () => {
+        if (process.env.NODE_ENV === 'production') {
+            return process.env.REACT_APP_URL_BACK_NODE;
+        }
+        return 'http://localhost:4000';
+    };
+
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
 
     // Obtener datos de la publicación
     useEffect(() => {
         if (!id_post) return;
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_post/${id_post}`)
+        fetch(`${getPhpBackendUrl()}/obtener_post/${id_post}`)
             .then(res => res.json())
             .then(data => {
                 setPost(data.post);
@@ -34,7 +47,7 @@ export default function Publicacion() {
     useEffect(() => {
         if (!id_post) return;
         setComentariosLoading(true);
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentario_de_post/${id_post}`)
+        fetch(`${getPhpBackendUrl()}/obtener_comentario_de_post/${id_post}`)
             .then(res => {
                 if (!res.ok) throw new Error('Error al obtener comentarios');
                 return res.json();
@@ -51,7 +64,7 @@ export default function Publicacion() {
 
     // Obtener otras publicaciones (sin context)
     useEffect(() => {
-        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_posts')
+        fetch(`${getPhpBackendUrl()}/obtener_posts`)
             .then(res => res.json())
             .then(data => {
                 // Filtra para no mostrar la publicación actual
@@ -81,13 +94,20 @@ export default function Publicacion() {
 
     // Manejar envío de comentario
     const handleComentar = async () => {
-        if (!nuevoComentario.trim()) return;
         const autor_id = localStorage.getItem('id_usuario');
-        if (!autor_id || !id_post) return;
-
+        if (!autor_id) {
+            setModal({
+                isOpen: true,
+                title: 'Acceso restringido',
+                message: 'Debes iniciar sesión para comentar en una publicación.',
+                type: 'warning'
+            });
+            return;
+        }
+        if (!nuevoComentario.trim() || !id_post) return;
         setEnviando(true);
         try {
-            const res = await fetch('http://localhost/Proyectos/LvUp_backend/api/crear_comentario', {
+            const res = await fetch(`${getPhpBackendUrl()}/crear_comentario`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
                 body: new URLSearchParams({
@@ -101,7 +121,7 @@ export default function Publicacion() {
                 // Recargar comentarios tras comentar
                 setNuevoComentario('');
                 setComentariosLoading(true);
-                fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_comentario_de_post/${id_post}`)
+                fetch(`${getPhpBackendUrl()}/obtener_comentario_de_post/${id_post}`)
                     .then(res => res.json())
                     .then(data => {
                         setComentarios(Array.isArray(data) ? data : data.comentarios || []);
@@ -112,6 +132,20 @@ export default function Publicacion() {
             // Puedes mostrar un error si quieres
         }
         setEnviando(false);
+    };
+
+    // Nuevo handler para el click en Comentar
+    const handleComentarClick = () => {
+        if (!localStorage.getItem('id_usuario')) {
+            setModal({
+                isOpen: true,
+                title: 'Acceso restringido',
+                message: 'Debes iniciar sesión para comentar en una publicación.',
+                type: 'warning'
+            });
+            return;
+        }
+        handleComentar();
     };
 
     if (!post) {
@@ -149,13 +183,13 @@ export default function Publicacion() {
                             ) : post.nombre}
                         </h2>
                     </div>
-                    <img src={post.img_publicacion} alt='imagen_publicacion' />
+                    <img src={`${getBackendUrl()}${post.img_publicacion}`} alt='imagen_publicacion' />
                 </div>
                 <div id='cent'>
                     <div id='info_publicacion'>
                         <h2>{post.titulo}</h2>
                         <h2>Puntuación: ⭐{post.puntuacion}/5</h2>
-                        <span>{post.descripcion}</span>
+                        <span>{post.comentario}</span>
                     </div>
                     <div id='comentario_publicacion'>
                         <input
@@ -205,7 +239,7 @@ export default function Publicacion() {
                         {otrasPublicaciones && otrasPublicaciones.length > 0 ? (
                             otrasPublicaciones.map((p, idx) => (
                                 <div className='tarjeta_publicaciones' key={p.id_post || idx} style={{ margin: '1rem 0' }}>
-                                    <img src={p.img_publicacion} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })}/>
+                                    <img src={`${getBackendUrl()}${p.img_publicacion}`} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })} />
                                     <h3
                                         onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })}
                                     >

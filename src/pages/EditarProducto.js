@@ -20,6 +20,21 @@ export default function EditarProducto() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
 
+    const getBackendUrl = () => {
+        if (process.env.NODE_ENV === 'production') {
+            return process.env.REACT_APP_URL_BACK_NODE;
+        }
+        return 'http://localhost:4000';
+    };
+
+    // Utilidad para obtener la URL base del backend PHP según entorno
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     // Detectar si es admin editando SOLO si viene del panel de administración
     // El admin en su panel personal verá el formulario de usuario normal
     const isAdminEdit = location.state?.fromAdministracion === true && localStorage.getItem('rol') === 'admin' && localStorage.getItem('adminView') === 'admin';
@@ -46,7 +61,7 @@ export default function EditarProducto() {
             // Eliminar la imagen anterior si existe y es diferente
             if (producto.imagen_url && producto.imagen_url !== '/img_lvup/' + imagen.name) {
                 try {
-                    await fetch('http://localhost:4000/img_lvup/delete', {
+                    await fetch(`${getBackendUrl()}/img_lvup/delete`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ filename: producto.imagen_url.replace('/img_lvup/', '') })
@@ -60,7 +75,7 @@ export default function EditarProducto() {
             const formData = new FormData();
             formData.append('imagen', imagen);
             try {
-                const resImg = await fetch('http://localhost:4000/img_lvup/upload', {
+                const resImg = await fetch(`${getBackendUrl()}/img_lvup/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -89,7 +104,7 @@ export default function EditarProducto() {
             ...(isAdminEdit && { stock, fecha_salida: fechaSalida, empresa, pegi })
         };
         try {
-            const res = await fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_producto/${producto.id_producto}`, {
+            const res = await fetch(`${getPhpBackendUrl()}/actualizar_producto/${producto.id_producto}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')
@@ -102,7 +117,7 @@ export default function EditarProducto() {
                 setModalOpen(true);
                 setTimeout(() => {
                     setModalOpen(false);
-                    navigate('/Administracion', { state:{ fromNavigate: true }});
+                    navigate('/Administracion', { state: { fromNavigate: true } });
                 }, 1500);
             } else {
                 setModalMsg('Error al actualizar el producto.');
@@ -122,7 +137,7 @@ export default function EditarProducto() {
                     <input type="text" value={nombre} onChange={e => setNombre(e.target.value)} required maxLength={150} />
                 </label>
                 <label>Descripción corta:
-                    <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} required  />
+                    <input type="text" value={descripcion} onChange={e => setDescripcion(e.target.value)} required />
                 </label>
                 <label>Descripción larga:
                     <textarea value={descripcionLarga} onChange={e => setDescripcionLarga(e.target.value)} required rows={6} />
@@ -134,8 +149,8 @@ export default function EditarProducto() {
                     <input type="file" accept="image/*" onChange={handleImagenChange} />
                     {producto?.imagen_url && (
                         <div>
-                            <span>Imagen actual:</span><br/>
-                            <img src={producto.imagen_url} alt="imagen_producto" height="97" width="79" />
+                            <span>Imagen actual:</span><br />
+                            <img src={`${getBackendUrl()}${producto.imagen_url}`} alt="imagen_producto" height="97" width="79" />
                         </div>
                     )}
                 </label>
@@ -173,10 +188,10 @@ export default function EditarProducto() {
                 )}
                 <button type="submit" className="btn-principal">Guardar cambios</button>
             </form>
-            <Modal 
-                isOpen={modalOpen} 
-                onClose={() => setModalOpen(false)} 
-                message={modalMsg} 
+            <Modal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                message={modalMsg}
             />
         </div>
     );

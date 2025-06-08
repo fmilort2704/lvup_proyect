@@ -31,6 +31,13 @@ export default function Header() {
     const gmail = localStorage.getItem('email');
     const puntos = localStorage.getItem('puntos');
 
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     const toggleMenu = () => setMenuOpen(!menuOpen);
     const toggleSubmenu = () => setSubmenuOpen(!submenuOpen);
 
@@ -41,7 +48,7 @@ export default function Header() {
     };
     // Obtener todos los productos para la búsqueda (lupa)
     useEffect(() => {
-        fetch('http://localhost/Proyectos/LvUp_backend/api/obtener_productos')
+        fetch(`${getPhpBackendUrl()}/obtener_productos`)
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data.productos)) {
@@ -138,12 +145,7 @@ export default function Header() {
                                                     </button>
                                                 </Link>
                                                 <button onClick={() => {
-                                                    localStorage.removeItem('id_usuario');
-                                                    localStorage.removeItem('nombre');
-                                                    localStorage.removeItem('email');
-                                                    localStorage.removeItem('puntos');
-                                                    localStorage.removeItem('verificado');
-                                                    localStorage.removeItem('rol');
+                                                    localStorage.clear();
                                                     setShowUserMenu(false);
                                                     window.location.href = '/';
                                                 }}>

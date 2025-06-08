@@ -36,12 +36,20 @@ export default function EditarPerfil() {
     const [modalMessage, setModalMessage] = useState("");
     const [modalType, setModalType] = useState("info");
 
+    // Utilidad para obtener la URL base del backend PHP según entorno
+    const getPhpBackendUrl = () => {
+    if (process.env.NODE_ENV === 'production') {
+        return "/Proyectos/LvUp_backend/api";
+    }
+    return 'http://localhost/Proyectos/LvUp_backend/api';
+};
+
     useEffect(() => {
         // Obtener datos actuales del usuario al cargar el componente
         const id_usuario = localStorage.getItem('id_usuario');
         if (id_usuario) {
             const token = localStorage.getItem('token');
-            fetch(`http://localhost/Proyectos/LvUp_backend/api/obtener_usuario/${id_usuario}`,
+            fetch(`${getPhpBackendUrl()}/obtener_usuario/${id_usuario}`,
                 { headers: { 'Authorization': 'Bearer ' + token } })
                 .then(res => res.json())
                 .then(data => {
@@ -114,7 +122,7 @@ export default function EditarPerfil() {
             body.email = localStorage.getItem('email');
         }
 
-        fetch(`http://localhost/Proyectos/LvUp_backend/api/actualizar_usuario/${id_usuario}`, {
+        fetch(`${getPhpBackendUrl()}/actualizar_usuario/${id_usuario}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
