@@ -22,7 +22,7 @@ export default function Producto() {
     };
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "/Proyectos/LvUp_backend/api";
+        return "https://proyecto-backend-rzsf.onrender.com";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
