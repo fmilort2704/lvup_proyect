@@ -12,13 +12,6 @@ export default function NuevaPublicacion() {
     const [publicacionCreada, setPublicacionCreada] = useState(false);
     const navigate = useNavigate();
 
-    const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-};
-
 const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
         return "/Proyectos/LvUp_backend/api";
@@ -46,7 +39,7 @@ const getPhpBackendUrl = () => {
         formData.append('imagen', imagen);
         let imagen_url = '';
         try {
-            const resImg = await fetch(`${getBackendUrl()}/img_lvup/upload`, {
+            const resImg = await fetch(`https://backendreactproject-production.up.railway.app/img_lvup/upload`, {
                 method: 'POST',
                 body: formData
             });

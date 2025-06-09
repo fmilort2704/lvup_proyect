@@ -22,13 +22,6 @@ export default function Carrito() {
     });
     const navigate = useNavigate();
 
-    const getBackendUrl = () => {
-        if (process.env.NODE_ENV === 'production') {
-            return process.env.REACT_APP_URL_BACK_NODE;
-        }
-        return 'http://localhost:4000';
-    };
-
     // Utilidad para obtener la URL base del backend PHP según entorno
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
@@ -308,7 +301,8 @@ export default function Carrito() {
                             {productos.map((producto, idx) => (
                                 <div key={producto.id_producto || idx} className="producto-carrito">
                                     <div className="producto-carrito-header">
-                                        <img src={`${getBackendUrl()}${producto.imagen_url}`} alt='producto_imagen' />                                        <div className="producto-carrito-header-info">
+                                        <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt='producto_imagen' />
+                                        <div className="producto-carrito-header-info">
                                             <h3>{producto.nombre}</h3>
                                             <img
                                                 id='papelera_icon'
@@ -367,7 +361,7 @@ export default function Carrito() {
                                     <div key={producto.id_producto} className="tarjeta-producto">
                                         <div className="productos">
                                             <div id='f-line-producto'>
-                                                <img src={`${getBackendUrl()}${producto.imagen_url}`}
+                                                <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
                                                     alt={producto.nombre}
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}

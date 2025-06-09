@@ -30,13 +30,6 @@ export default function Pasarela() {
     const [descuento, setDescuento] = useState(0);
     const navigate = useNavigate();
 
-    const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-};
-
 const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
         return "/Proyectos/LvUp_backend/api";
@@ -119,7 +112,7 @@ const getPhpBackendUrl = () => {
                 precio,
                 cantidad
             };
-            const res = await fetch(`${getBackendUrl()}/enviar_recibo`, {
+            const res = await fetch(`https://backendreactproject-production.up.railway.app/enviar_recibo`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)

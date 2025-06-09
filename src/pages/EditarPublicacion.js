@@ -14,13 +14,6 @@ export default function EditarPublicacion() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
 
-    const getBackendUrl = () => {
-        if (process.env.NODE_ENV === 'production') {
-            return process.env.REACT_APP_URL_BACK_NODE;
-        }
-        return 'http://localhost:4000';
-    };
-
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
         return "/Proyectos/LvUp_backend/api";
@@ -54,7 +47,7 @@ export default function EditarPublicacion() {
             // Eliminar la imagen anterior si existe y es diferente
             if (publicacion.imagen_url && publicacion.imagen_url !== '/img_lvup/' + imagen.name) {
                 try {
-                    await fetch(`${getBackendUrl()}/img_lvup/delete`, {
+                    await fetch(`https://backendreactproject-production.up.railway.app/img_lvup/delete`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ filename: publicacion.imagen_url.replace('/img_lvup/', '') })
@@ -68,7 +61,7 @@ export default function EditarPublicacion() {
             const formData = new FormData();
             formData.append('imagen', imagen);
             try {
-                const resImg = await fetch(`${getBackendUrl()}/img_lvup/upload`, {
+                const resImg = await fetch(`https://backendreactproject-production.up.railway.app/img_lvup/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -138,7 +131,7 @@ export default function EditarPublicacion() {
                     {publicacion?.img_publicacion && (
                         <div>
                             <span>Imagen actual:</span><br />
-                            <img src={`${getBackendUrl()}${publicacion.img_publicacion}`} alt="imagen_publicacion" height="97" width="79" />
+                            <img src={`https://backendreactproject-production.up.railway.app${publicacion.img_publicacion}`} alt="imagen_publicacion" height="97" width="79" />
                         </div>
                     )}
                 </label>

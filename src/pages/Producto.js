@@ -14,12 +14,6 @@ export default function Producto() {
     const { productos } = useProductos();
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
     const navigate = useNavigate();
-    const getBackendUrl = () => {
-        if (process.env.NODE_ENV === 'production') {
-            return process.env.REACT_APP_URL_BACK_NODE;
-        }
-        return 'http://localhost:4000';
-    };
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
         return "/Proyectos/LvUp_backend/api";
@@ -99,11 +93,11 @@ export default function Producto() {
 
     let pegiSrc = '';
     switch (producto.pegi) {
-        case '3': pegiSrc = `${getBackendUrl()}/img_lvup/pegi3.webp`; break;
-        case '7': pegiSrc = `${getBackendUrl()}/img_lvup/pegi7.webp`; break;
-        case '12': pegiSrc = `${getBackendUrl()}/img_lvup/pegi12.webp`; break;
-        case '16': pegiSrc = `${getBackendUrl()}/img_lvup/pegi16.webp`; break;
-        case '18': pegiSrc = `${getBackendUrl()}/img_lvup/pegi18.webp`; break;
+        case '3': pegiSrc = `https://backendreactproject-production.up.railway.app/img_lvup/pegi3.webp`; break;
+        case '7': pegiSrc = `https://backendreactproject-production.up.railway.app/img_lvup/pegi7.webp`; break;
+        case '12': pegiSrc = `https://backendreactproject-production.up.railway.app/img_lvup/pegi12.webp`; break;
+        case '16': pegiSrc = `https://backendreactproject-production.up.railway.app/img_lvup/pegi16.webp`; break;
+        case '18': pegiSrc = `https://backendreactproject-production.up.railway.app/img_lvup/pegi18.webp`; break;
         default: pegiSrc = '';
     }
     console.log(pegiSrc);
@@ -112,7 +106,7 @@ export default function Producto() {
         <div id='container'>
             <div id='detallesProducto'>
                 <div id='detallesProducto-fl'>
-                    <img src={`${getBackendUrl()}${producto.imagen_url}`} alt='img_producto' id='imgProducto' />
+                    <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt='img_producto' id='imgProducto' />
                     <div className="info-texto">
                         <div id='prodTit'>
                             <h2>{producto.nombre}</h2>
@@ -197,7 +191,7 @@ export default function Producto() {
                                     <div className="productos">
                                         <div id='f-line-producto'>
                                             <img
-                                                src={`${getBackendUrl()}${producto.imagen_url}`}
+                                                src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
                                                 alt={producto.nombre}
                                                 style={{ cursor: 'pointer' }}
                                                 onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}

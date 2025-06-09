@@ -19,12 +19,6 @@ export default function Publicacion() {
     const [otrasPublicaciones, setOtrasPublicaciones] = useState([]);
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
     const navigate = useNavigate();
-    const getBackendUrl = () => {
-        if (process.env.NODE_ENV === 'production') {
-            return process.env.REACT_APP_URL_BACK_NODE;
-        }
-        return 'http://localhost:4000';
-    };
 
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
@@ -183,7 +177,7 @@ export default function Publicacion() {
                             ) : post.nombre}
                         </h2>
                     </div>
-                    <img src={`${getBackendUrl()}${post.img_publicacion}`} alt='imagen_publicacion' />
+                    <img src={`https://backendreactproject-production.up.railway.app${post.img_publicacion}`} alt='imagen_publicacion' />
                 </div>
                 <div id='cent'>
                     <div id='info_publicacion'>
@@ -239,7 +233,7 @@ export default function Publicacion() {
                         {otrasPublicaciones && otrasPublicaciones.length > 0 ? (
                             otrasPublicaciones.map((p, idx) => (
                                 <div className='tarjeta_publicaciones' key={p.id_post || idx} style={{ margin: '1rem 0' }}>
-                                    <img src={`${getBackendUrl()}${p.img_publicacion}`} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })} />
+                                    <img src={`https://backendreactproject-production.up.railway.app${p.img_publicacion}`} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })} />
                                     <h3
                                         onClick={() => navigate('/Publicacion', { state: { post: p, fromNavigate: true } })}
                                     >

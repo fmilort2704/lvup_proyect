@@ -4,12 +4,6 @@ import Modal from '../components/Modal';
 import user_icon from '../assets/Iconos/icono_login.svg';
 
 // Utilidad para obtener la URL base del backend según entorno
-const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-};
 
 const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
@@ -136,7 +130,7 @@ export default function Valoraciones() {
             {post ? (
                 <div className="tarjeta_publicaciones valoracion-publicacion-preview" style={{ marginBottom: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
                     <h3>{post.titulo}</h3>
-                    <img src={`${getBackendUrl()}${post.img_publicacion}`} alt="imagen_publicacion" style={{ width: '90%', maxWidth: '200px', height: '110px', objectFit: 'contain', borderRadius: '8px', background: '#fff', margin: '0.5rem auto 1rem auto', display: 'block' }} />
+                    <img src={`https://backendreactproject-production.up.railway.app${post.img_publicacion}`} alt="imagen_publicacion" style={{ width: '90%', maxWidth: '200px', height: '110px', objectFit: 'contain', borderRadius: '8px', background: '#fff', margin: '0.5rem auto 1rem auto', display: 'block' }} />
                     <img src={user_icon} alt='icono_usuario' />
                     <span>{post.nombre}</span>
                     <span>{post.descripcion}</span>
