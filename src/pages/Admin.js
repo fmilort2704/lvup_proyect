@@ -113,7 +113,11 @@ export default function Admin() {
                 try {
                     // const token = localStorage.getItem('token');
                     // await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
-                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id}`, { method: 'DELETE' });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_usuario=${id}`
+                    });
                     setModalMsg('Usuario bloqueado.');
                     setModalOpen(true);
                     if (adminView === 'admin') {
@@ -137,7 +141,11 @@ export default function Admin() {
                 try {
                     // const token = localStorage.getItem('token');
                     // await fetch(`${getPhpBackendUrl()}/borrar_producto/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
-                    await fetch(`${getPhpBackendUrl()}/borrar_producto/${id}`, { method: 'DELETE' });
+                    await fetch(`${getPhpBackendUrl()}/borrar_producto`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_producto=${id}`
+                    });
                     setModalMsg('Producto eliminado.');
                     setModalOpen(true);
                     if (adminView === 'admin') {
@@ -161,7 +169,11 @@ export default function Admin() {
                 try {
                     // const token = localStorage.getItem('token');
                     // await fetch(`${getPhpBackendUrl()}/eliminar_post/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
-                    await fetch(`${getPhpBackendUrl()}/eliminar_post/${id}`, { method: 'DELETE' });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_post`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_post=${id}`
+                    });
                     setModalMsg('Publicación eliminada.');
                     setModalOpen(true);
                     if (adminView === 'admin') {
@@ -185,7 +197,11 @@ export default function Admin() {
                 try {
                     // const token = localStorage.getItem('token');
                     // await fetch(`${getPhpBackendUrl()}/eliminar_comentario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
-                    await fetch(`${getPhpBackendUrl()}/eliminar_comentario/${id}`, { method: 'DELETE' });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_comentario`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_comentario=${id}`
+                    });
                     setModalMsg('Comentario eliminado.');
                     setModalOpen(true);
                     if (adminView === 'admin') {
@@ -238,7 +254,11 @@ export default function Admin() {
                             onConfirm: async () => {
                                 try {
                                     const id_usuario = localStorage.getItem('id_usuario');
-                                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id_usuario}`, { method: 'DELETE' });
+                                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario`, {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                        body: `id_usuario=${id_usuario}`
+                                    });
                                     localStorage.clear();
                                     setModalMsg('Cuenta eliminada. ¡Hasta pronto!');
                                     setModalOpen(true);

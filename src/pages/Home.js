@@ -156,7 +156,9 @@ export default function Home() {
                 <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
                   alt={producto.nombre}
                   style={{ cursor: 'pointer' }}
-                  onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
+                  onClick={() => {
+                    navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } });
+                  }}
                 />
                 <div className="producto-info">
                   <div className="producto-header">
@@ -165,6 +167,7 @@ export default function Home() {
                         className='link'
                         to={`/producto`}
                         state={{ id_producto: producto.id_producto, fromNavigate: true }}
+                        onClick={() => localStorage.setItem('last_producto_id', producto.id_producto)}
                       >
                         {producto.nombre}
                       </Link>
@@ -195,7 +198,12 @@ export default function Home() {
             <div key={producto.id} className="tarjeta-producto">
               <div className="productos">
                 <div id='f-line-producto'>
-                  <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt={producto.nombre} />
+                  <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt={producto.nombre}
+                    onClick={() => {
+                      localStorage.setItem('last_producto_id', producto.id_producto);
+                      navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } });
+                    }}
+                  />
                   <div className="producto-info">
                     <div className="producto-header">
                       <h3>
@@ -203,6 +211,7 @@ export default function Home() {
                           className='link'
                           to={`/producto`}
                           state={{ id_producto: producto.id_producto, fromNavigate: true }}
+                          onClick={() => localStorage.setItem('last_producto_id', producto.id_producto)}
                         >
                           {producto.nombre}
                         </Link>

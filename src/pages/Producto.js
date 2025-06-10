@@ -1,25 +1,59 @@
-import { useProductos } from '../context/ProductosContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import paypal from '../assets/Iconos/mingcute--paypal-line.svg';
 import google from '../assets/Iconos/devicon--google.svg';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
 import { Link } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from '../components/Modal';
 
 export default function Producto() {
-    console.log(paypal)
     const location = useLocation();
-    const id_producto = location.state?.id_producto;
-    const { productos } = useProductos();
+    const [productos, setProductos] = useState([]);
+    const [producto, setProducto] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
     const navigate = useNavigate();
     const getPhpBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return "/Proyectos/LvUp_backend/api";
-    }
-    return 'http://localhost/Proyectos/LvUp_backend/api';
-};
+        if (process.env.NODE_ENV === 'production') {
+            return "/Proyectos/LvUp_backend/api";
+        }
+        return 'http://localhost/Proyectos/LvUp_backend/api';
+    };
+
+    // Obtener id_producto de location.state o de localStorage
+    const id_producto = location.state?.id_producto || localStorage.getItem('last_producto_id');
+
+    // Guardar el id en localStorage si viene de navegación
+    useEffect(() => {
+        if (location.state?.id_producto) {
+            localStorage.setItem('last_producto_id', location.state.id_producto);
+        }
+    }, [location.state]);
+
+    // Obtener productos del backend
+    useEffect(() => {
+        setLoading(true);
+        fetch(`${getPhpBackendUrl()}/obtener_productos`)
+            .then(res => res.json())
+            .then(data => {
+                setProductos(data.productos || []);
+                setLoading(false);
+            })
+            .catch(() => {
+                setProductos([]);
+                setLoading(false);
+            });
+    }, []);
+
+    // Buscar el producto seleccionado
+    useEffect(() => {
+        if (!id_producto || productos.length === 0) {
+            setProducto(null);
+            return;
+        }
+        const prod = productos.find(p => String(p.id_producto) === String(id_producto));
+        setProducto(prod || null);
+    }, [id_producto, productos]);
 
     const handleAddToCart = async (producto_id) => {
         const usuario_id = localStorage.getItem('id_usuario');
@@ -85,10 +119,7 @@ export default function Producto() {
         return `${d}-${m}-${y}`;
     }
 
-    if (!productos) return <div>Cargando...</div>;
-    if (!id_producto) return <div>Producto no encontrado</div>;
-
-    const producto = productos.find(p => String(p.id_producto) === String(id_producto));
+    if (loading) return <div>Cargando...</div>;
     if (!producto) return <div>Producto no encontrado</div>;
 
     let pegiSrc = '';

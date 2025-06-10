@@ -68,9 +68,9 @@ export default function NuevaPublicacion() {
                 const res = await fetch(`${getPhpBackendUrl()}/crear_post`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/x-www-form-urlencoded'
                     },
-                    body: JSON.stringify(body)
+                    body: `titulo=${titulo}&descripcion=${descripcion}&comentario=${contenido}&imagen_url=${imagen_url}&autor_id=${usuario_id}`
                 });
                 const data = await res.json();
                 if (data) {

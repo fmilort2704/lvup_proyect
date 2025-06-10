@@ -7,10 +7,12 @@ import google from '../assets/Iconos/devicon--google.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import Modal from '../components/Modal';
 import addCarrito from '../assets/Iconos/tdesign--cart-add.svg';
+import { useProductos } from '../context/ProductosContext';
 
 export default function Carrito() {
     const [productos, setProductos] = useState([]);
     const [otrosProductos, setOtrosProductos] = useState([]);
+    const [sugeridos, setSugeridos] = useState([]); // Nuevo estado para sugeridos
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [modal, setModal] = useState({
@@ -21,6 +23,7 @@ export default function Carrito() {
         onConfirm: null
     });
     const navigate = useNavigate();
+    const { setProductos: setProductosContext } = useProductos();
 
     // Utilidad para obtener la URL base del backend PHP según entorno
     const getPhpBackendUrl = () => {
@@ -63,11 +66,28 @@ export default function Carrito() {
             .then(res => res.json())
             .then(data => {
                 setOtrosProductos(data.productos || []);
+                // Elegir sugeridos aleatorios solo una vez
+                if (data.productos && data.productos.length > 0) {
+                    const mezclados = [...data.productos].sort(() => Math.random() - 0.5).slice(0, 4);
+                    setSugeridos(mezclados);
+                }
             })
             .catch(() => {
                 setOtrosProductos([]);
+                setSugeridos([]);
             });
     }, []);
+
+    // Utilidad para recargar productos globales tras cambios en el carrito
+    const recargarProductosGlobal = async () => {
+        try {
+            const res = await fetch(`${getPhpBackendUrl()}/obtener_productos`);
+            const data = await res.json();
+            setProductosContext(data.productos || []);
+        } catch (e) {
+            setProductosContext([]);
+        }
+    };
 
     const showModal = (title, message, type = 'info', onConfirm = null) => {
         setModal({
@@ -103,25 +123,27 @@ export default function Carrito() {
     const eliminarProducto = (producto_id, nombre_producto) => {
         showModal(
             "Confirmar eliminación",
-            `¿Estás seguro de que quieres eliminar "${nombre_producto}" del carrito?`,
+            `¿Estás seguro de que quieres eliminar \"${nombre_producto}\" del carrito?`,
             "confirm",
             () => {
-                // const token = localStorage.getItem('token');
-                // fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito/${producto_id}`,
-                //     { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } })
-                    fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito/${producto_id}`, { method: 'DELETE' })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.error) {
-                            showModal("Error", data.error, "error");
-                        } else {
-                            showModal("Éxito", "Producto eliminado del carrito correctamente", "success");
-                            recargarCarrito();
-                        }
-                    })
-                    .catch(() => {
-                        showModal("Error", "Error al eliminar el producto del carrito", "error");
-                    });
+                fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `id_producto=${producto_id}`
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        showModal("Error", data.error, "error");
+                    } else {
+                        setProductos(prev => prev.filter(p => (p.id_producto || p.producto_id) !== producto_id));
+                        showModal("Éxito", "Producto eliminado del carrito correctamente", "success");
+                        recargarProductosGlobal();
+                    }
+                })
+                .catch(() => {
+                    showModal("Error", "Error al eliminar el producto del carrito", "error");
+                });
                 closeModal();
             }
         );
@@ -162,7 +184,7 @@ export default function Carrito() {
             //     body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
             // });
                 const res = await fetch(`${getPhpBackendUrl()}/incrementar_carrito`, {
-                    method: 'PUT',
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
@@ -173,6 +195,7 @@ export default function Carrito() {
                 showModal("Error", data.error, "error");
             } else {
                 recargarCarrito();
+                recargarProductosGlobal();
             }
         } catch (e) {
             showModal("Error", "Error al comprobar el stock o incrementar la cantidad", "error");
@@ -181,70 +204,53 @@ export default function Carrito() {
 
     const decrementarCantidad = (producto_id, nombre_producto, cantidad_actual) => {
         const id_usuario = localStorage.getItem('id_usuario');
-        // const token = localStorage.getItem('token');
         if (cantidad_actual === 1) {
             showModal(
                 "Confirmar eliminación",
-                `El producto "${nombre_producto}" tiene cantidad 1. ¿Quieres eliminarlo del carrito?`,
+                `El producto \"${nombre_producto}\" tiene cantidad 1. ¿Quieres eliminarlo del carrito?`,
                 "confirm",
                 () => {
-                    // fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
-                    //     method: 'PUT',
-                    //     headers: {
-                    //         'Content-Type': 'application/x-www-form-urlencoded',
-                    //         'Authorization': 'Bearer ' + token
-                    //     },
-                    //     body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-                    // })
-                        fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-                        })
-                        .then(res => res.json())
-                        .then(data => {
-                            if (data.error) {
-                                showModal("Error", data.error, "error");
-                            } else {
-                                showModal("Éxito", "Producto eliminado del carrito", "success");
-                                recargarCarrito();
-                            }
-                        })
-                        .catch(() => {
-                            showModal("Error", "Error al decrementar la cantidad", "error");
-                        });
+                    fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_producto=${producto_id}`
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            showModal("Error", data.error, "error");
+                        } else {
+                            setProductos(prev => prev.filter(p => (p.id_producto || p.producto_id) !== producto_id));
+                            showModal("Éxito", "Producto eliminado del carrito correctamente", "success");
+                            recargarProductosGlobal();
+                        }
+                    })
+                    .catch(() => {
+                        showModal("Error", "Error al eliminar el producto del carrito", "error");
+                    });
                     closeModal();
                 }
             );
         } else {
-            // fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
-            //     method: 'PUT',
-            //     headers: {
-            //         'Content-Type': 'application/x-www-form-urlencoded',
-            //         'Authorization': 'Bearer ' + token
-            //     },
-            //     body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-            // })
-                fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.error) {
-                        showModal("Error", data.error, "error");
-                    } else {
-                        recargarCarrito();
-                    }
-                })
-                .catch(() => {
-                    showModal("Error", "Error al decrementar la cantidad", "error");
-                });
+            fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    showModal("Error", data.error, "error");
+                } else {
+                    recargarCarrito();
+                    recargarProductosGlobal();
+                }
+            })
+            .catch(() => {
+                showModal("Error", "Error al decrementar la cantidad", "error");
+            });
         }
     };
 
@@ -283,6 +289,7 @@ export default function Carrito() {
                     'success'
                 );
                 recargarCarrito();
+                recargarProductosGlobal();
             } else {
                 showModal(
                     'Error',
@@ -385,48 +392,44 @@ export default function Carrito() {
                 <div id='otrosProductos'>
                     <h2>Otros productos</h2>
                     <div className="productos">
-                        {otrosProductos.length > 0 &&
-                            otrosProductos
-                                .sort(() => Math.random() - 0.5)
-                                .slice(0, 4)
-                                .map(producto => (
-                                    <div key={producto.id_producto} className="tarjeta-producto">
-                                        <div className="productos">
-                                            <div id='f-line-producto'>
-                                                <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
-                                                    alt={producto.nombre}
-                                                    style={{ cursor: 'pointer' }}
-                                                    onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
-                                                />
-                                                <div className="producto-info">
-                                                    <div className="producto-header">
-                                                        <h3>
-                                                            <Link
-                                                                className='link'
-                                                                to={`/producto`}
-                                                                state={{ id_producto: producto.id_producto, fromNavigate: true }}
-                                                            >
-                                                                {producto.nombre}
-                                                            </Link>
-                                                        </h3>
-                                                    </div>
-                                                    <p>{producto.descripcion}</p>
-                                                    <p className="precio">Desde {producto.precio}€</p>
+                        {sugeridos.length > 0 &&
+                            sugeridos.map(producto => (
+                                <div key={producto.id_producto} className="tarjeta-producto">
+                                    <div className="productos">
+                                        <div id='f-line-producto'>
+                                            <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
+                                                alt={producto.nombre}
+                                                style={{ cursor: 'pointer' }}
+                                                onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
+                                            />
+                                            <div className="producto-info">
+                                                <div className="producto-header">
+                                                    <h3>
+                                                        <Link
+                                                            className='link'
+                                                            to={`/producto`}
+                                                            state={{ id_producto: producto.id_producto, fromNavigate: true }}
+                                                        >
+                                                            {producto.nombre}
+                                                        </Link>
+                                                    </h3>
                                                 </div>
-                                                <img
-                                                    id='addCarritoIcon'
-                                                    onClick={() => handleAddToCart(producto.id_producto)}
-                                                    src={addCarrito}
-                                                    alt='carrito'
-
-                                                />
-                                                <button id='addCarritoBtn' onClick={() => handleAddToCart(producto.id_producto)}>
-                                                    Añadir a la cesta
-                                                </button>
+                                                <p>{producto.descripcion}</p>
+                                                <p className="precio">Desde {producto.precio}€</p>
                                             </div>
+                                            <img
+                                                id='addCarritoIcon'
+                                                onClick={() => handleAddToCart(producto.id_producto)}
+                                                src={addCarrito}
+                                                alt='carrito'
+                                            />
+                                            <button id='addCarritoBtn' onClick={() => handleAddToCart(producto.id_producto)}>
+                                                Añadir a la cesta
+                                            </button>
                                         </div>
                                     </div>
-                                ))}
+                                </div>
+                            ))}
                     </div>
                 </div>
             </div>

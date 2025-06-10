@@ -70,10 +70,10 @@ export default function Valoraciones() {
                 const nuevaMedia = Math.round((puntuacionActual * numVal + puntuacion) / (numVal + 1));
                 try {
                     const token = localStorage.getItem('token');
-                    await fetch(`${getPhpBackendUrl()}/editar_valoracion_publicacion/${post.id_post}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token*/ },
-                        body: JSON.stringify({ puntuacion: nuevaMedia, numVal: numVal + 1 })
+                    await fetch(`${getPhpBackendUrl()}/editar_valoracion_publicacion`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: `id_post=${id_post}&puntuacion=${nuevaMedia}&numVal=${numVal + 1}`
                     });
                     setModal({ isOpen: true, message: '¡Valoración enviada!', type: 'success' });
                     setTimeout(() => {

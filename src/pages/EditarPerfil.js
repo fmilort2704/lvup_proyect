@@ -123,11 +123,17 @@ export default function EditarPerfil() {
             body.email = localStorage.getItem('email');
         }
 
-        fetch(`${getPhpBackendUrl()}/actualizar_usuario/${id_usuario}`, {
-            method: 'PUT',
-            // headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
+        // Ejemplo para actualizar usuario:
+        // fetch(`${getPhpBackendUrl()}/actualizar_usuario`, {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        //   body: `id_usuario=${id_usuario}&nombre=${nombre}&email=${email}&contrasenya=${contrasenya}`
+        // });
+
+        fetch(`${getPhpBackendUrl()}/actualizar_usuario`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `id_usuario=${id_usuario}&nombre=${nombre}&email=${email}&contrasenya=${editFields.password ? newPassword : localStorage.getItem('contrasenya')}`
         })
             .then(res => res.json())
             .then(data => {

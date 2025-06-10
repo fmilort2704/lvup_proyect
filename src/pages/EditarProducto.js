@@ -97,12 +97,12 @@ export default function EditarProducto() {
             ...(isAdminEdit && { stock, fecha_salida: fechaSalida, empresa, pegi })
         };
         try {
-            const res = await fetch(`${getPhpBackendUrl()}/actualizar_producto/${producto.id_producto}`, {
-                method: 'PUT',
+            const res = await fetch(`${getPhpBackendUrl()}/actualizar_producto`, {
+                method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json', // 'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    'Content-Type': 'application/x-www-form-urlencoded', // 'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
-                body: JSON.stringify(body)
+                body: `id_producto=${producto.id_producto}&nombre=${nombre}&descripcion=${descripcion}&descripcion_larga=${descripcionLarga}&precio=${precio}&imagen_url=${imagen_url}&categoria_id=${categoria}`
             });
             const data = await res.json();
             if (data && !data.error) {

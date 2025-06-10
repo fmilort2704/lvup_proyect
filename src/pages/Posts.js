@@ -1,12 +1,37 @@
-import { useEffect, useState } from 'react';
+    import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/estilos.css';
-import { usePublicaciones } from '../context/PublicacionesContext';
 
 export default function Posts() {
-    const { posts, loading, error } = usePublicaciones();
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    const getPhpBackendUrl = () => {
+        if (process.env.NODE_ENV === 'production') {
+            return "/Proyectos/LvUp_backend/api";
+        }
+        return 'http://localhost/Proyectos/LvUp_backend/api';
+    };
+
+    useEffect(() => {
+        setLoading(true);
+        fetch(`${getPhpBackendUrl()}/obtener_posts`)
+            .then(res => {
+                if (!res.ok) throw new Error('Error al obtener posts');
+                return res.json();
+            })
+            .then(data => {
+                setPosts(Array.isArray(data) ? data : data.posts || []);
+                setLoading(false);
+            })
+            .catch(err => {
+                setError(err.message);
+                setLoading(false);
+            });
+    }, []);
 
     if (loading) return <div id="container">Cargando posts...</div>;
     if (error) return <div id="container">Error: {error}</div>;

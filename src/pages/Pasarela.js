@@ -207,22 +207,24 @@ const getPhpBackendUrl = () => {
                         console.log(usarPuntos)
                         if (usarPuntos && puntosUsuario > 0) {
                             console.log("Puntos: " + puntosCompra)
-                            await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario/${id_usuario}`, {
-                                method: 'PUT',
+                            await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario`, {
+                                method: 'POST',
                                 headers: { /*'Authorization': 'Bearer ' + token,*/ 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ puntos: puntosCompra })
+                                body: JSON.stringify({ id_usuario, puntos: puntosCompra })
                             });
                             setPuntosUsuario(puntosCompra);
+                            localStorage.setItem('puntos', puntosCompra);
                         } else {
                             const puntosTotales = puntosUsuario + puntosCompra;
                             console.log("Puntos: " + puntosTotales)
                             // Sumar los puntos generados por la compra
-                            await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario/${id_usuario}`, {
-                                method: 'PUT',
+                            await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario`, {
+                                method: 'POST',
                                 headers: { /*'Authorization': 'Bearer ' + token,*/ 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ puntos: puntosTotales })
+                                body: JSON.stringify({ id_usuario, puntos: puntosTotales })
                             });
-                            setPuntosUsuario(puntosTotales)
+                            setPuntosUsuario(puntosTotales);
+                            localStorage.setItem('puntos', puntosTotales);
                         }
                         // Actualizar puntos en frontend
 
@@ -240,9 +242,11 @@ const getPhpBackendUrl = () => {
                 // Marcar carrito como procesado (puedes ajustar el endpoint según tu backend)
                 if (carrito && carrito.length > 0) {
                     if (id_usuario) {
-                        fetch(`${getPhpBackendUrl()}/procesar_carrito/${id_usuario}`, {
-                            method: 'PUT',
-                            //headers: { 'Authorization': 'Bearer ' + token }
+                        // Cambiar procesar_carrito para usar la nueva ruta POST sin parámetro en la URL y enviar el id_usuario en el body
+                        fetch(`${getPhpBackendUrl()}/procesar_carrito`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `id_usuario=${id_usuario}`
                         });
                     }
                 }
