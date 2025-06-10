@@ -325,7 +325,14 @@ export default function Carrito() {
         });
     };
 
-    if (loading) return <div id="container"><h2>Cargando carrito...</h2></div>;
+    if (loading) return (
+        <div id="container">
+            <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Cargando carrito...</p>
+            </div>
+        </div>
+    );
     if (error) return <div id="container"><h2>{error}</h2></div>;
 
     return (

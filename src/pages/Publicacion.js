@@ -206,7 +206,12 @@ export default function Publicacion() {
                     </div>
                     <div id='publicacion_comentarios'>
                         {comentariosLoading ? (
-                            <span>Cargando comentarios...</span>
+                            <span>
+                                <div className="loading-container">
+                                    <div className="spinner"></div>
+                                    <p>Cargando comentarios...</p>
+                                </div>
+                            </span>
                         ) : comentariosError ? (
                             <span style={{ color: 'red' }}>Error: {comentariosError}</span>
                         ) : comentarios.length === 0 ? (

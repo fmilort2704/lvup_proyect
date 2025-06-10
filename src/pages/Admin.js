@@ -231,7 +231,14 @@ export default function Admin() {
         );
     }
 
-    if (loading) return <div className="admin-panel"><h2>Cargando...</h2></div>;
+    if (loading) return (
+        <div className="admin-panel">
+            <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Cargando...</p>
+            </div>
+        </div>
+    );
 
     return (
         <div className="admin-panel">

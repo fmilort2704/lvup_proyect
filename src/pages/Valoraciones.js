@@ -150,7 +150,12 @@ export default function Valoraciones() {
             ) : (
                 <>
                     <h2>Valoraciones del usuario</h2>
-                    {loading ? <p>Cargando valoraciones...</p> : (
+                    {loading ? (
+                        <div className="loading-container">
+                            <div className="spinner"></div>
+                            <p>Cargando valoraciones...</p>
+                        </div>
+                    ) : (
                         valoraciones.length === 0 ? <p>No hay valoraciones aún.</p> :
                             <ul className="valoraciones-list">
                                 {valoraciones.map((v, i) => (

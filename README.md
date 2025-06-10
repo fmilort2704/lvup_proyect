@@ -1,70 +1,150 @@
-# Getting Started with Create React App
+# LvUp - Instrucciones de arranque
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Dominio principal de producción:**
+[http://lvup.kesug.com/](http://lvup.kesug.com/)
 
-## Available Scripts
+## Arrancar el frontend (React)
 
-In the project directory, you can run:
+En la raíz del proyecto, ejecuta:
 
-### `npm start`
+```bash
+npm start
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Esto levantará la aplicación React en modo desarrollo en [http://localhost:3000](http://localhost:3000).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Arrancar el backend Node (para imágenes y otros servicios)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Ve a la carpeta del backend Node (por ejemplo, `c:/Proyectos/backend/` si es tu ruta):
+2. Ejecuta:
 
-### `npm run build`
+```bash
+node index.js
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Esto levantará el backend Node en el puerto configurado (por defecto suele ser el 3001 o 5000).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Arrancar el backend PHP (Slim)
 
-### `npm run eject`
+1. Debes tener XAMPP instalado y activo.
+2. Coloca la carpeta `api` dentro de:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```
+xampp/htdocs/Proyectos/LvUp_backend/api
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. Arranca Apache desde el panel de XAMPP.
+4. El backend PHP estará disponible en:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+http://localhost/Proyectos/LvUp_backend/api
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+## Despliegue en InfinityFree
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+El frontend y el backend PHP se despliegan juntos en InfinityFree.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 1. Instalar FileZilla
 
-### Code Splitting
+Para subir los archivos a InfinityFree, instala FileZilla (https://filezilla-project.org/).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### 2. Conéctate por FTP con estos datos:
+- **Servidor:** ftpupload.net
+- **Usuario:** if0_39174413
+- **Contraseña:** BCMRNQBc1
+- **Puerto:** 21
 
-### Analyzing the Bundle Size
+### 3. Sube los archivos
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. **Frontend (React):**
+   - Genera el build de producción ejecutando:
+     ```bash
+     npm run build
+     ```
+   - Sube el contenido de la carpeta `build` a la carpeta `htdocs` de tu hosting en InfinityFree usando FileZilla.
 
-### Making a Progressive Web App
+2. **Backend PHP (Slim):**
+   - Sube la carpeta `api` del backend PHP a la ruta:
+     ```
+     htdocs/Proyectos/LvUp_backend/api
+     ```
+   - La estructura debe ser igual que en local con XAMPP.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 4. Acceso
+- El frontend será accesible desde la URL principal de tu dominio de InfinityFree.
+- El backend PHP estará accesible desde:
+  ```
+  https://lvup.kesug.com/Proyectos/LvUp_backend/api
+  ```
 
-### Advanced Configuration
+**Nota:**
+- Asegúrate de que las rutas relativas en el frontend apunten correctamente al backend PHP en producción.
+- Si usas rutas absolutas, actualízalas según el dominio de InfinityFree.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
+## Despliegue del backend Node (imágenes y servicios) en Railway
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Puedes desplegar el backend Node (por ejemplo, para la gestión de imágenes) en Railway conectando tu repositorio de GitHub:
 
-### `npm run build` fails to minify
+1. **Sube tu backend Node a un repositorio de GitHub**
+   - Asegúrate de que el archivo `index.js` y el resto del backend estén en un repositorio propio.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+2. **Crea un proyecto en Railway**
+   - Ve a [https://railway.app/](https://railway.app/) y regístrate o inicia sesión.
+   - Haz clic en "New Project" y elige "Deploy from GitHub repo".
+   - Selecciona el repositorio donde tienes tu backend Node.
+
+3. **Configura los comandos de despliegue**
+   - Railway detectará automáticamente si tienes un `package.json` y usará `npm install` y `node index.js` o `npm start`.
+   - Si necesitas un puerto específico, asegúrate de que tu backend use `process.env.PORT`.
+
+4. **Variables de entorno**
+   - Configura las variables de entorno necesarias (por ejemplo, credenciales, rutas, etc.) en la sección "Variables" de Railway.
+
+5. **Obtén la URL pública**
+   - Una vez desplegado, Railway te dará una URL pública para tu backend Node.
+   - Usa esa URL en tu frontend o backend PHP para hacer peticiones al backend Node en producción.
+
+**Nota:**
+- El código fuente del backend Node (backend de React para imágenes y servicios) no está en este repositorio. Puedes consultarlo en:
+  [https://github.com/fmilort2704/backend_react_project](https://github.com/fmilort2704/backend_react_project)
+- Este repositorio está vinculado directamente con el host Railway para despliegue automático.
+- Cada vez que hagas push a la rama principal del repositorio, Railway redeplegará automáticamente el backend.
+- Si usas rutas relativas en desarrollo, recuerda cambiarlas a la URL de Railway en producción.
+
+---
+
+## Base de datos (MySQL)
+
+### InfinityFree
+Si usas InfinityFree, la base de datos y sus credenciales son:
+
+- **Host:** sql113.infinityfree.com
+- **Usuario:** if0_39174413
+- **Contraseña:** BCMRNQBc1
+- **Base de datos:** if0_39174413_db_lvup
+
+Asegúrate de que el backend PHP use las credenciales correctas según el entorno donde esté desplegado.
+
+---
+
+## Resumen rápido
+
+- Frontend: `npm start` en la raíz del proyecto.
+- Backend Node: `node index.js` en la carpeta correspondiente.
+- Backend PHP: asegúrate de tener la carpeta `api` en `xampp/htdocs/Proyectos/LvUp_backend` y Apache y MySQL arrancado.
+
+---
+
+## Notas
+- Si tienes problemas de CORS, revisa que ambos backends permitan el origen de tu frontend.
+- Para producción, asegúrate de que las rutas y dominios coincidan con tu despliegue.
+
+---

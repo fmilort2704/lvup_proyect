@@ -141,7 +141,17 @@ export default function Home() {
     ? productos
     : productos;
 
-  if (loading) return <div>Cargando...</div>;
+  if (loading) return (
+    <>
+      <div id="container">
+        <div className="loading-container">
+          <div className="spinner"></div>
+          <p>Cargando productos...</p>
+        </div>
+      </div>
+    </>
+  );
+
   console.log(localStorage);
 
   return (

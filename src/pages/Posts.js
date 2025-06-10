@@ -1,4 +1,4 @@
-    import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import icon_login from '../assets/Iconos/icono_login.svg';
 import './css/estilos.css';
@@ -33,7 +33,14 @@ export default function Posts() {
             });
     }, []);
 
-    if (loading) return <div id="container">Cargando posts...</div>;
+    if (loading) return (
+        <div id="container">
+            <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Cargando posts...</p>
+            </div>
+        </div>
+    );
     if (error) return <div id="container">Error: {error}</div>;
 
     return (

@@ -6,7 +6,7 @@
     margin: 0.5rem 0.5rem;
 }
 
-h3{
+h3 {
     cursor: pointer;
 }
 
@@ -211,7 +211,7 @@ img[alt='carrito'] {
     background: #444;
 }
 
-#pago{
+#pago {
     width: 100%;
     display: flex;
     align-items: center;
@@ -219,7 +219,7 @@ img[alt='carrito'] {
     margin-left: 1rem;
 }
 
-#pago-producto{
+#pago-producto {
     width: 100%;
     display: flex;
     align-items: center;
@@ -227,9 +227,9 @@ img[alt='carrito'] {
     margin-left: 1rem;
 }
 
-#comprarCtn{
+#comprarCtn {
     display: flex;
-    justify-content:center 
+    justify-content: center
 }
 
 /* --- IniciarSesion.css y EditarPerfil.css (solo lo necesario para Home) --- */
@@ -278,16 +278,16 @@ img[alt='carrito'] {
     height: 24px;
 }
 
-.icono-ojo{
-    position:absolute;
-    right:0.7rem;
-    top:48%;
-    transform:translateY(-50%);
-    width:24px;
-    height:24px;
-    cursor:pointer;
-    opacity:0.7;
-    z-index:2;
+.icono-ojo {
+    position: absolute;
+    right: 0.7rem;
+    top: 48%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+    z-index: 2;
 }
 
 .botones-login {
@@ -298,7 +298,7 @@ img[alt='carrito'] {
 
 .botones-login button,
 #addCarritoBtn,
-#papeleraBtn{
+#papeleraBtn {
     font-weight: bold;
     font-size: 1rem;
     background-color: black;
@@ -515,7 +515,7 @@ button.btnPago img {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: .8em;  
+    gap: .8em;
     border-radius: 1rem;
 }
 
@@ -922,13 +922,41 @@ a {
     overflow-x: auto;
 }
 
-#tienesCuenta{
+#tienesCuenta {
     cursor: pointer;
 }
 
-#resCompra{
-    margin-bottom:1rem;
+#resCompra {
+    margin-bottom: 1rem;
     font-weight: bold
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+}
+
+.spinner {
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid #007bff;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 @media (max-width: 700px) {
@@ -1180,25 +1208,25 @@ a {
     display: none;
 }
 
-#botonesAdmin{
+#botonesAdmin {
     display: flex;
     gap: 2rem;
     justify-content: center;
     margin: 2rem 0;
 }
 
-#ctnCrearProducto{
-     display: flex;
-     justify-content: flex-end;
-     margin-bottom: 1.2rem
+#ctnCrearProducto {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.2rem
 }
 
-#imgProducto{
+#imgProducto {
     height: 150px;
     width: 120px;
 }
 
-#btnPuntos{
+#btnPuntos {
     margin-top: .5rem;
     font-weight: bold;
     font-size: 1rem;
@@ -1209,9 +1237,10 @@ a {
     border-radius: .5rem;
 }
 
-#btnPagar{
+#btnPagar {
     cursor: pointer;
 }
+
 /* --- Home Responsive: en escritorio (≥900px) imagen arriba, info debajo, tarjetas flexibles --- */
 @media (min-width: 600px) {
     .productos {

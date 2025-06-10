@@ -119,7 +119,14 @@ export default function Producto() {
         return `${d}-${m}-${y}`;
     }
 
-    if (loading) return <div>Cargando...</div>;
+    if (loading) return (
+        <div id="container">
+            <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Cargando producto...</p>
+            </div>
+        </div>
+    );
     if (!producto) return <div>Producto no encontrado</div>;
 
     let pegiSrc = '';
