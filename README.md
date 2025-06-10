@@ -2,6 +2,64 @@
 
 **Dominio principal de producción:**
 [http://lvup.kesug.com/](http://lvup.kesug.com/)
+---
+
+## Requisitos para arrancar el frontend (React)
+
+Antes de arrancar el frontend, asegúrate de tener instalado:
+
+- **Node.js** (recomendado v16 o superior): [Descargar Node.js](https://nodejs.org/)
+- **npm** (se instala junto con Node.js)
+
+### Instalación de dependencias
+
+En la raíz del proyecto (donde está el frontend), ejecuta:
+
+```bash
+npm install
+```
+
+Esto instalará todas las dependencias necesarias para React y sus librerías asociadas.
+
+### Variables de entorno (opcional)
+
+Si necesitas configurar variables de entorno para el frontend (por ejemplo, rutas de API personalizadas), crea un archivo `.env` en la raíz del proyecto. Ejemplo:
+
+```
+REACT_APP_API_URL=http://localhost/Proyectos/LvUp_backend/api
+```
+
+---
+
+## Requisitos para arrancar el backend Node (index.js)
+
+Antes de arrancar el backend Node (`index.js`), asegúrate de tener instalado:
+
+- **Node.js** (recomendado v16 o superior): [Descargar Node.js](https://nodejs.org/)
+- **npm** (se instala junto con Node.js)
+
+### Instalación de dependencias
+
+En la carpeta del backend (donde está `index.js`), ejecuta:
+
+```bash
+npm install
+```
+
+Esto instalará las dependencias necesarias: `express`, `cors`, `nodemailer`, `multer`, `dotenv`, etc.
+
+### Variables de entorno
+
+Crea un archivo `.env` en la raíz del backend con las siguientes variables (ajusta según tus credenciales):
+
+```
+EMAIL_USER=tu_email@gmail.com
+EMAIL_PASS=tu_contraseña_de_aplicacion
+```
+
+Estas variables son necesarias para el envío de correos desde el backend.
+
+---
 
 ## Arrancar el frontend (React)
 
