@@ -14,19 +14,14 @@ export default function Home() {
   const [modal, setModal] = useState({ isOpen: false, title: '', message: '', type: 'info' });
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(null);
 
-  const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-      return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-  };
-
   const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
+
+  console.log(getPhpBackendUrl());
 
   const categoriaToId = {
     'Consolas': 1,
@@ -66,7 +61,7 @@ export default function Home() {
       const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')
+          'Content-Type': 'application/json'//, 'Authorization': 'Bearer ' + localStorage.getItem('token')
         },
         body: JSON.stringify(body)
       });
@@ -158,7 +153,7 @@ export default function Home() {
           <div key={producto.id} className="tarjeta-producto">
             <div className="producto">
               <div id='f-line-producto'>
-                <img src={`${getBackendUrl()}${producto.imagen_url}`}
+                <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
                   alt={producto.nombre}
                   style={{ cursor: 'pointer' }}
                   onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}
@@ -200,7 +195,7 @@ export default function Home() {
             <div key={producto.id} className="tarjeta-producto">
               <div className="productos">
                 <div id='f-line-producto'>
-                  <img src={`${getBackendUrl()}${producto.imagen_url}`} alt={producto.nombre} />
+                  <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt={producto.nombre} />
                   <div className="producto-info">
                     <div className="producto-header">
                       <h3>

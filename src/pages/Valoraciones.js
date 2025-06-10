@@ -4,16 +4,10 @@ import Modal from '../components/Modal';
 import user_icon from '../assets/Iconos/icono_login.svg';
 
 // Utilidad para obtener la URL base del backend según entorno
-const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-};
 
 const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
@@ -42,8 +36,8 @@ export default function Valoraciones() {
         if (!id_usuario) return;
         setLoading(true);
         const token = localStorage.getItem('token');
-        fetch(`${getPhpBackendUrl()}/obtener_valoraciones_usuario/${id_usuario}`,
-            { headers: { 'Authorization': 'Bearer ' + token } })
+        fetch(`${getPhpBackendUrl()}/obtener_valoraciones_usuario/${id_usuario}`/*,
+            { headers: { 'Authorization': 'Bearer ' + token } }*/)
             .then(res => res.json())
             .then(data => {
                 setValoraciones(data.valoraciones || []);
@@ -78,7 +72,7 @@ export default function Valoraciones() {
                     const token = localStorage.getItem('token');
                     await fetch(`${getPhpBackendUrl()}/editar_valoracion_publicacion/${post.id_post}`, {
                         method: 'PUT',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token*/ },
                         body: JSON.stringify({ puntuacion: nuevaMedia, numVal: numVal + 1 })
                     });
                     setModal({ isOpen: true, message: '¡Valoración enviada!', type: 'success' });
@@ -99,7 +93,7 @@ export default function Valoraciones() {
                 const token = localStorage.getItem('token');
                 res = await fetch(`${getPhpBackendUrl()}/crear_valoracion`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                    headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token*/ },
                     body: JSON.stringify({
                         valorado_id: id_usuario,
                         valorador_id: id_usuario_logueado,
@@ -114,8 +108,8 @@ export default function Valoraciones() {
                     setPuntuacion(5);
                     // Recargar valoraciones
                     setLoading(true);
-                    fetch(`${getPhpBackendUrl()}/obtener_valoraciones_usuario/${id_usuario}`,
-                        { headers: { 'Authorization': 'Bearer ' + token } })
+                    fetch(`${getPhpBackendUrl()}/obtener_valoraciones_usuario/${id_usuario}`/*,
+                        { headers: { 'Authorization': 'Bearer ' + token } }*/)
                         .then(res => res.json())
                         .then(data => {
                             setValoraciones(data.valoraciones || []);
@@ -136,7 +130,7 @@ export default function Valoraciones() {
             {post ? (
                 <div className="tarjeta_publicaciones valoracion-publicacion-preview" style={{ marginBottom: '2rem', boxShadow: '0 2px 8px rgba(0,0,0,0.10)' }}>
                     <h3>{post.titulo}</h3>
-                    <img src={`${getBackendUrl()}${post.img_publicacion}`} alt="imagen_publicacion" style={{ width: '90%', maxWidth: '200px', height: '110px', objectFit: 'contain', borderRadius: '8px', background: '#fff', margin: '0.5rem auto 1rem auto', display: 'block' }} />
+                    <img src={`https://backendreactproject-production.up.railway.app${post.img_publicacion}`} alt="imagen_publicacion" style={{ width: '90%', maxWidth: '200px', height: '110px', objectFit: 'contain', borderRadius: '8px', background: '#fff', margin: '0.5rem auto 1rem auto', display: 'block' }} />
                     <img src={user_icon} alt='icono_usuario' />
                     <span>{post.nombre}</span>
                     <span>{post.descripcion}</span>

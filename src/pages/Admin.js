@@ -16,7 +16,7 @@ export default function Admin() {
 
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
@@ -52,18 +52,20 @@ export default function Admin() {
             return;
         }
         try {
-            const token = localStorage.getItem('token');
-            console.log(token);
+            // const token = localStorage.getItem('token');
             const [productosRes, postsRes, comentariosRes] = await Promise.all([
-                fetch(`${getPhpBackendUrl()}/obtener_productos_usuarios/${id_usuario}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en productos: ' + t); } }),
-                fetch(`${getPhpBackendUrl()}/obtener_post_por_usuario/${id_usuario}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en posts: ' + t); } }),
-                fetch(`${getPhpBackendUrl()}/obtener_comentarios_usuario/${id_usuario}`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en comentarios: ' + t); } }),
+                // fetch(`${getPhpBackendUrl()}/obtener_productos_usuarios/${id_usuario}`, {
+                //     headers: { 'Authorization': 'Bearer ' + token }
+                // }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en productos: ' + t); } }),
+                // fetch(`${getPhpBackendUrl()}/obtener_post_por_usuario/${id_usuario}`, {
+                //     headers: { 'Authorization': 'Bearer ' + token }
+                // }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en posts: ' + t); } }),
+                // fetch(`${getPhpBackendUrl()}/obtener_comentarios_usuario/${id_usuario}`, {
+                //     headers: { 'Authorization': 'Bearer ' + token }
+                // }).then(async r => { const t = await r.text(); try { return JSON.parse(t); } catch { throw new Error('Respuesta inválida del backend en comentarios: ' + t); } }),
+                fetch(`${getPhpBackendUrl()}/obtener_productos_usuarios/${id_usuario}`),
+                fetch(`${getPhpBackendUrl()}/obtener_post_por_usuario/${id_usuario}`),
+                fetch(`${getPhpBackendUrl()}/obtener_comentarios_usuario/${id_usuario}`),
             ]);
             setProductos(productosRes.productos || []);
             setPosts(postsRes.posts || []);
@@ -78,18 +80,22 @@ export default function Admin() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('token');
+            // const token = localStorage.getItem('token');
             const [usuariosRes, productosRes, postsRes, comentariosRes] = await Promise.all([
-                fetch(`${getPhpBackendUrl()}/usuarios`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(r => r.json()),
-                fetch(`${getPhpBackendUrl()}/obtener_productos`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(r => r.json()),
-                fetch(`${getPhpBackendUrl()}/obtener_posts`).then(r => r.json()), // pública
-                fetch(`${getPhpBackendUrl()}/comentarios`, {
-                    headers: { 'Authorization': 'Bearer ' + token }
-                }).then(r => r.json()),
+                // fetch(`${getPhpBackendUrl()}/usuarios`, {
+                //     headers: { 'Authorization': 'Bearer ' + token }
+                // }).then(r => r.json()),
+                // fetch(`${getPhpBackendUrl()}/obtener_productos`, {
+                //     headers: { 'Authorization': 'Bearer ' + token }
+                // }).then(r => r.json()),
+                // fetch(`${getPhpBackendUrl()}/obtener_posts`).then(r => r.json()), // pública
+                // fetch(`${getPhpBackendUrl()}/comentarios`, {
+                //     headers: { 'Authorization': 'Bearer ' + token }
+                // }).then(r => r.json()),
+                fetch(`${getPhpBackendUrl()}/usuarios`),
+                fetch(`${getPhpBackendUrl()}/obtener_productos`),
+                fetch(`${getPhpBackendUrl()}/obtener_posts`),
+                fetch(`${getPhpBackendUrl()}/comentarios`),
             ]);
             console.log(usuariosRes);
             console.log(productosRes);
@@ -112,8 +118,9 @@ export default function Admin() {
             msg: '¿Bloquear este usuario permanentemente?',
             onConfirm: async () => {
                 try {
-                    const token = localStorage.getItem('token');
-                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    // const token = localStorage.getItem('token');
+                    // await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_usuario/${id}`, { method: 'DELETE' });
                     setModalMsg('Usuario bloqueado.');
                     setModalOpen(true);
                     fetchData();
@@ -131,8 +138,9 @@ export default function Admin() {
             msg: '¿Eliminar este producto?',
             onConfirm: async () => {
                 try {
-                    const token = localStorage.getItem('token');
-                    await fetch(`${getPhpBackendUrl()}/borrar_producto/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    // const token = localStorage.getItem('token');
+                    // await fetch(`${getPhpBackendUrl()}/borrar_producto/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/borrar_producto/${id}`, { method: 'DELETE' });
                     setModalMsg('Producto eliminado.');
                     setModalOpen(true);
                     fetchData();
@@ -150,8 +158,9 @@ export default function Admin() {
             msg: '¿Eliminar esta publicación?',
             onConfirm: async () => {
                 try {
-                    const token = localStorage.getItem('token');
-                    await fetch(`${getPhpBackendUrl()}/eliminar_post/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    // const token = localStorage.getItem('token');
+                    // await fetch(`${getPhpBackendUrl()}/eliminar_post/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_post/${id}`, { method: 'DELETE' });
                     setModalMsg('Publicación eliminada.');
                     setModalOpen(true);
                     fetchData();
@@ -169,8 +178,9 @@ export default function Admin() {
             msg: '¿Eliminar este comentario?',
             onConfirm: async () => {
                 try {
-                    const token = localStorage.getItem('token');
-                    await fetch(`${getPhpBackendUrl()}/eliminar_comentario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    // const token = localStorage.getItem('token');
+                    // await fetch(`${getPhpBackendUrl()}/eliminar_comentario/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+                    await fetch(`${getPhpBackendUrl()}/eliminar_comentario/${id}`, { method: 'DELETE' });
                     setModalMsg('Comentario eliminado.');
                     setModalOpen(true);
                     fetchData();

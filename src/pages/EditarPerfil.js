@@ -39,7 +39,7 @@ export default function EditarPerfil() {
     // Utilidad para obtener la URL base del backend PHP según entorno
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
@@ -48,9 +48,10 @@ export default function EditarPerfil() {
         // Obtener datos actuales del usuario al cargar el componente
         const id_usuario = localStorage.getItem('id_usuario');
         if (id_usuario) {
-            const token = localStorage.getItem('token');
-            fetch(`${getPhpBackendUrl()}/obtener_usuario/${id_usuario}`,
-                { headers: { 'Authorization': 'Bearer ' + token } })
+            // const token = localStorage.getItem('token');
+             fetch(`${getPhpBackendUrl()}/obtener_usuario/${id_usuario}`/*,
+                 { headers: { 'Authorization': 'Bearer ' + token } }*/)
+                fetch(`${getPhpBackendUrl()}/obtener_usuario/${id_usuario}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.usuario) {
@@ -124,7 +125,8 @@ export default function EditarPerfil() {
 
         fetch(`${getPhpBackendUrl()}/actualizar_usuario/${id_usuario}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            // headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
         })
             .then(res => res.json())

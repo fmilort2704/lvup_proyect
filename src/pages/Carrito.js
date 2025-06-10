@@ -22,17 +22,10 @@ export default function Carrito() {
     });
     const navigate = useNavigate();
 
-    const getBackendUrl = () => {
-        if (process.env.NODE_ENV === 'production') {
-            return process.env.REACT_APP_URL_BACK_NODE;
-        }
-        return 'http://localhost:4000';
-    };
-
     // Utilidad para obtener la URL base del backend PHP según entorno
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
@@ -46,10 +39,11 @@ export default function Carrito() {
             setLoading(false);
             return;
         }
-        const token = localStorage.getItem('token');
-        console.log(token)
-        fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`,
-            { headers: { 'Authorization': 'Bearer ' + token } })
+        // const token = localStorage.getItem('token');
+        // console.log(token)
+        // fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`,
+        //     { headers: { 'Authorization': 'Bearer ' + token } })
+            fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`)
             .then(res => res.json())
             .then(data => {
                 // Filtrar solo productos con estado 'activo'
@@ -92,9 +86,10 @@ export default function Carrito() {
     const recargarCarrito = () => {
         const id_usuario = localStorage.getItem('id_usuario');
         if (!id_usuario) return;
-        const token = localStorage.getItem('token');
-        fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`,
-            { headers: { 'Authorization': 'Bearer ' + token } })
+        // const token = localStorage.getItem('token');
+        // fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`,
+        //     { headers: { 'Authorization': 'Bearer ' + token } })
+            fetch(`${getPhpBackendUrl()}/obtener_productos_carrito/${id_usuario}`)
             .then(res => res.json())
             .then(data => {
                 const activos = (data.carrito || []).filter(p => p.estado === 'activo');
@@ -111,9 +106,10 @@ export default function Carrito() {
             `¿Estás seguro de que quieres eliminar "${nombre_producto}" del carrito?`,
             "confirm",
             () => {
-                const token = localStorage.getItem('token');
-                fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito/${producto_id}`,
-                    { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } })
+                // const token = localStorage.getItem('token');
+                // fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito/${producto_id}`,
+                //     { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } })
+                    fetch(`${getPhpBackendUrl()}/eliminar_producto_carrito/${producto_id}`, { method: 'DELETE' })
                     .then(res => res.json())
                     .then(data => {
                         if (data.error) {
@@ -133,14 +129,15 @@ export default function Carrito() {
 
     const incrementarCantidad = async (producto_id, nombre_producto) => {
         const id_usuario = localStorage.getItem('id_usuario');
-        const token = localStorage.getItem('token');
+        // const token = localStorage.getItem('token');
         // Buscar el producto en el carrito para saber la cantidad actual
         const productoCarrito = productos.find(p => p.producto_id === producto_id || p.id_producto === producto_id);
         const cantidadActual = productoCarrito ? productoCarrito.cantidad : 0;
         try {
             // Consultar el stock real del producto
-            const resStock = await fetch(`${getPhpBackendUrl()}/obtener_stock/${producto_id}`,
-                { headers: { 'Authorization': 'Bearer ' + token } });
+            // const resStock = await fetch(`${getPhpBackendUrl()}/obtener_stock/${producto_id}`,
+            //     { headers: { 'Authorization': 'Bearer ' + token } });
+                const resStock = await fetch(`${getPhpBackendUrl()}/obtener_stock/${producto_id}`);
             const dataStock = await resStock.json();
             console.log(dataStock.stock.stock)
             const stock = dataStock.stock.stock;
@@ -156,14 +153,21 @@ export default function Carrito() {
                 return;
             }
             // Si hay stock suficiente, incrementar
-            const res = await fetch(`${getPhpBackendUrl()}/incrementar_carrito`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-            });
+            // const res = await fetch(`${getPhpBackendUrl()}/incrementar_carrito`, {
+            //     method: 'PUT',
+            //     headers: {
+            //         'Content-Type': 'application/x-www-form-urlencoded',
+            //         'Authorization': 'Bearer ' + token
+            //     },
+            //     body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+            // });
+                const res = await fetch(`${getPhpBackendUrl()}/incrementar_carrito`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+                });
             const data = await res.json();
             if (data.error) {
                 showModal("Error", data.error, "error");
@@ -177,21 +181,28 @@ export default function Carrito() {
 
     const decrementarCantidad = (producto_id, nombre_producto, cantidad_actual) => {
         const id_usuario = localStorage.getItem('id_usuario');
-        const token = localStorage.getItem('token');
+        // const token = localStorage.getItem('token');
         if (cantidad_actual === 1) {
             showModal(
                 "Confirmar eliminación",
                 `El producto "${nombre_producto}" tiene cantidad 1. ¿Quieres eliminarlo del carrito?`,
                 "confirm",
                 () => {
-                    fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                            'Authorization': 'Bearer ' + token
-                        },
-                        body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-                    })
+                    // fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
+                    //     method: 'PUT',
+                    //     headers: {
+                    //         'Content-Type': 'application/x-www-form-urlencoded',
+                    //         'Authorization': 'Bearer ' + token
+                    //     },
+                    //     body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+                    // })
+                        fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+                        })
                         .then(res => res.json())
                         .then(data => {
                             if (data.error) {
@@ -208,14 +219,21 @@ export default function Carrito() {
                 }
             );
         } else {
-            fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
-            })
+            // fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
+            //     method: 'PUT',
+            //     headers: {
+            //         'Content-Type': 'application/x-www-form-urlencoded',
+            //         'Authorization': 'Bearer ' + token
+            //     },
+            //     body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+            // })
+                fetch(`${getPhpBackendUrl()}/decrementar_carrito`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `usuario_id=${id_usuario}&producto_id=${producto_id}`
+                })
                 .then(res => res.json())
                 .then(data => {
                     if (data.error) {
@@ -240,16 +258,23 @@ export default function Carrito() {
             );
             return;
         }
-        const token = localStorage.getItem('token');
+        // const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: `usuario_id=${usuario_id}&producto_id=${producto_id}`
-            });
+            // const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
+            //     method: 'POST',
+            //     headers: {
+            //         'Content-Type': 'application/x-www-form-urlencoded',
+            //         'Authorization': 'Bearer ' + token
+            //     },
+            //     body: `usuario_id=${usuario_id}&producto_id=${producto_id}`
+            // });
+                const response = await fetch(`${getPhpBackendUrl()}/introducir_carrito`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `usuario_id=${usuario_id}&producto_id=${producto_id}`
+                });
             const data = await response.json();
             if (data.mensaje) {
                 showModal(
@@ -308,7 +333,8 @@ export default function Carrito() {
                             {productos.map((producto, idx) => (
                                 <div key={producto.id_producto || idx} className="producto-carrito">
                                     <div className="producto-carrito-header">
-                                        <img src={`${getBackendUrl()}${producto.imagen_url}`} alt='producto_imagen' />                                        <div className="producto-carrito-header-info">
+                                        <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt='producto_imagen' />
+                                        <div className="producto-carrito-header-info">
                                             <h3>{producto.nombre}</h3>
                                             <img
                                                 id='papelera_icon'
@@ -367,7 +393,7 @@ export default function Carrito() {
                                     <div key={producto.id_producto} className="tarjeta-producto">
                                         <div className="productos">
                                             <div id='f-line-producto'>
-                                                <img src={`${getBackendUrl()}${producto.imagen_url}`}
+                                                <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`}
                                                     alt={producto.nombre}
                                                     style={{ cursor: 'pointer' }}
                                                     onClick={() => navigate('/producto', { state: { id_producto: producto.id_producto, fromNavigate: true } })}

@@ -30,16 +30,9 @@ export default function Pasarela() {
     const [descuento, setDescuento] = useState(0);
     const navigate = useNavigate();
 
-    const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-};
-
 const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
@@ -50,7 +43,7 @@ const getPhpBackendUrl = () => {
         const token = localStorage.getItem('token');
         if (id_usuario && token) {
             fetch(`${getPhpBackendUrl()}/ver_puntos_usuario/${id_usuario}`, {
-                headers: { 'Authorization': 'Bearer ' + token }
+                //headers: { 'Authorization': 'Bearer ' + token }
             })
                 .then(res => res.json())
                 .then(data => {
@@ -119,7 +112,7 @@ const getPhpBackendUrl = () => {
                 precio,
                 cantidad
             };
-            const res = await fetch(`${getBackendUrl()}/enviar_recibo`, {
+            const res = await fetch(`https://backendreactproject-production.up.railway.app/enviar_recibo`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -134,7 +127,7 @@ const getPhpBackendUrl = () => {
                 try {
                     const token = localStorage.getItem('token');
                     const resUltimaVenta = await fetch(`${getPhpBackendUrl()}/ultima_venta`, {
-                        headers: { 'Authorization': 'Bearer ' + token }
+                        //headers: { 'Authorization': 'Bearer ' + token }
                     });
                     const dataUltimaVenta = await resUltimaVenta.json();
                     if (dataUltimaVenta) {
@@ -152,7 +145,7 @@ const getPhpBackendUrl = () => {
                     try {
                         const ventaRes = await fetch(`${getPhpBackendUrl()}/producir_venta`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token*/ },
                             body: JSON.stringify({
                                 id_venta,
                                 total: totalConDescuento, // aplicar descuento
@@ -167,7 +160,7 @@ const getPhpBackendUrl = () => {
                 } else {
                     const ventaRes = await fetch(`${getPhpBackendUrl()}/producir_venta`, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                        headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token*/ },
                         body: JSON.stringify({
                             id_venta,
                             total: totalConDescuento, // aplicar descuento también en compra individual
@@ -182,7 +175,7 @@ const getPhpBackendUrl = () => {
                         for (const p of carrito) {
                             await fetch(`${getPhpBackendUrl()}/producir_venta_detalle`, {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                                headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token*/ },
                                 body: JSON.stringify({
                                     id_venta,
                                     producto_id: p.id_producto,
@@ -194,7 +187,7 @@ const getPhpBackendUrl = () => {
                     } else {
                         await fetch(`${getPhpBackendUrl()}/producir_venta_detalle`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                            headers: { 'Content-Type': 'application/json'/*, 'Authorization': 'Bearer ' + token */},
                             body: JSON.stringify({
                                 id_venta,
                                 producto_id: location.state?.id_producto,
@@ -216,7 +209,7 @@ const getPhpBackendUrl = () => {
                             console.log("Puntos: " + puntosCompra)
                             await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario/${id_usuario}`, {
                                 method: 'PUT',
-                                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                                headers: { /*'Authorization': 'Bearer ' + token,*/ 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ puntos: puntosCompra })
                             });
                             setPuntosUsuario(puntosCompra);
@@ -226,7 +219,7 @@ const getPhpBackendUrl = () => {
                             // Sumar los puntos generados por la compra
                             await fetch(`${getPhpBackendUrl()}/actualizar_puntos_usuario/${id_usuario}`, {
                                 method: 'PUT',
-                                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+                                headers: { /*'Authorization': 'Bearer ' + token,*/ 'Content-Type': 'application/json' },
                                 body: JSON.stringify({ puntos: puntosTotales })
                             });
                             setPuntosUsuario(puntosTotales)
@@ -249,7 +242,7 @@ const getPhpBackendUrl = () => {
                     if (id_usuario) {
                         fetch(`${getPhpBackendUrl()}/procesar_carrito/${id_usuario}`, {
                             method: 'PUT',
-                            headers: { 'Authorization': 'Bearer ' + token }
+                            //headers: { 'Authorization': 'Bearer ' + token }
                         });
                     }
                 }

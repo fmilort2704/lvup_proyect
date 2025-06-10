@@ -8,13 +8,6 @@ export default function Posts() {
     const { posts, loading, error } = usePublicaciones();
     const navigate = useNavigate();
 
-    const getBackendUrl = () => {
-    if (process.env.NODE_ENV === 'production') {
-        return process.env.REACT_APP_URL_BACK_NODE;
-    }
-    return 'http://localhost:4000';
-};
-
     if (loading) return <div id="container">Cargando posts...</div>;
     if (error) return <div id="container">Error: {error}</div>;
 
@@ -27,7 +20,7 @@ export default function Posts() {
                 ) : (
                     posts.map(post => (
                         <div className='tarjeta_publicaciones' key={post.id_post || post.id}>
-                            <img src={`${getBackendUrl()}${post.img_publicacion}`} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post, fromNavigate: true } })}/>
+                            <img src={`https://backendreactproject-production.up.railway.app${post.img_publicacion}`} alt='imagen_publicacion' onClick={() => navigate('/Publicacion', { state: { post, fromNavigate: true } })}/>
                             <h3
                                 onClick={() => navigate('/Publicacion', { state: { post, fromNavigate: true } })}
                             >

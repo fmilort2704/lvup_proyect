@@ -20,17 +20,10 @@ export default function EditarProducto() {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalMsg, setModalMsg] = useState("");
 
-    const getBackendUrl = () => {
-        if (process.env.NODE_ENV === 'production') {
-            return process.env.REACT_APP_URL_BACK_NODE;
-        }
-        return 'http://localhost:4000';
-    };
-
     // Utilidad para obtener la URL base del backend PHP según entorno
     const getPhpBackendUrl = () => {
     if (process.env.NODE_ENV === 'production') {
-        return "https://proyecto-backend-rzsf.onrender.com";
+        return "/Proyectos/LvUp_backend/api";
     }
     return 'http://localhost/Proyectos/LvUp_backend/api';
 };
@@ -61,7 +54,7 @@ export default function EditarProducto() {
             // Eliminar la imagen anterior si existe y es diferente
             if (producto.imagen_url && producto.imagen_url !== '/img_lvup/' + imagen.name) {
                 try {
-                    await fetch(`${getBackendUrl()}/img_lvup/delete`, {
+                    await fetch(`https://backendreactproject-production.up.railway.app/img_lvup/delete`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ filename: producto.imagen_url.replace('/img_lvup/', '') })
@@ -75,7 +68,7 @@ export default function EditarProducto() {
             const formData = new FormData();
             formData.append('imagen', imagen);
             try {
-                const resImg = await fetch(`${getBackendUrl()}/img_lvup/upload`, {
+                const resImg = await fetch(`https://backendreactproject-production.up.railway.app/img_lvup/upload`, {
                     method: 'POST',
                     body: formData
                 });
@@ -107,7 +100,7 @@ export default function EditarProducto() {
             const res = await fetch(`${getPhpBackendUrl()}/actualizar_producto/${producto.id_producto}`, {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    'Content-Type': 'application/json', // 'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify(body)
             });
@@ -150,7 +143,7 @@ export default function EditarProducto() {
                     {producto?.imagen_url && (
                         <div>
                             <span>Imagen actual:</span><br />
-                            <img src={`${getBackendUrl()}${producto.imagen_url}`} alt="imagen_producto" height="97" width="79" />
+                            <img src={`https://backendreactproject-production.up.railway.app${producto.imagen_url}`} alt="imagen_producto" height="97" width="79" />
                         </div>
                     )}
                 </label>
